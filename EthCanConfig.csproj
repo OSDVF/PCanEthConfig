@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Models\" />
@@ -17,5 +17,9 @@
     <PackageReference Include="Avalonia" Version="0.9.10" />
     <PackageReference Include="Avalonia.Desktop" Version="0.9.10" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.9.10" />
+    <PackageReference Include="NSubsys" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>
