@@ -2,9 +2,11 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
+    <!-- dependencies coming from the package manager lock file should not be copied locally for .NET Core and .NETStandard projects -->
+    <CopyLocalLockFileAssemblies Condition="'$(CopyLocalLockFileAssemblies)' == ''">false</CopyLocalLockFileAssemblies>
+    <Authors>O.S.DV.F</Authors>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Models\" />
     <Compile Update="**\*.xaml.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
@@ -14,12 +16,32 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.9.10" />
+    <PackageReference Include="Avalonia" Version="0.9.11" />
     <PackageReference Include="Avalonia.Desktop" Version="0.9.10" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.9.10" />
     <PackageReference Include="NSubsys" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="AvaloniaEdit-master\src\AvaloniaEdit.Demo\App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="AvaloniaEdit-master\src\AvaloniaEdit\CodeCompletion\InsightWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="AvaloniaEdit-master\src\AvaloniaEdit\Editing\TextArea.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="AvaloniaEdit-master\src\AvaloniaEdit\Search\DropDownButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="AvaloniaEdit-master\src\AvaloniaEdit\Search\SearchPanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="AvaloniaEdit-master\src\AvaloniaEdit\TextEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
   </ItemGroup>
 </Project>
