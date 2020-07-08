@@ -1,6 +1,7 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:EthCanConfig.ViewModels;assembly=EthCanConfig"
+        xmlns:views="clr-namespace:EthCanConfig.Views;assembly=EthCanConfig"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:models="clr-namespace:EthCanConfig.Models;assembly=EthCanConfig"
@@ -44,10 +45,9 @@
       <TextBlock Text="Unknown" />
     </WrapPanel>
 
-
     <Grid Margin="0,10,0,0">
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="2*" />
         <ColumnDefinition Width="5" />
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
@@ -58,44 +58,7 @@
           <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock FontWeight="Bold" Text="Visual Editor" Margin="7" Grid.Row="0"/>
-        <TreeView Items="{Binding Settings}" Grid.Row="1" SelectedItem="{Binding SelectedSetting, Mode=TwoWay}">
-          <TreeView.DataTemplates>
-
-            <DataTemplate DataType="models:EnumSetting">
-              <StackPanel Classes="inner">
-                <TextBlock Text="{Binding Name}" Foreground="Brown"/>
-                <DropDown Items="{Binding Values}" BorderBrush="AliceBlue" SelectedItem="{Binding TypedValue, Mode=TwoWay}"/>
-              </StackPanel>
-            </DataTemplate>
-            
-            <DataTemplate DataType="models:StringSetting">
-              <StackPanel>
-                <TextBlock Text="{Binding Name}" Foreground="Crimson"/>
-                <TextBox Text="{Binding StringValue, Mode = TwoWay}" />
-              </StackPanel>
-            </DataTemplate>
-            
-            <TreeDataTemplate DataType="models:ContainerSetting" ItemsSource="{Binding InnerSettings}">
-              <StackPanel>
-                <TextBlock Text="{Binding Name}" Foreground="Gray"/>
-              </StackPanel>
-            </TreeDataTemplate>
-
-            <TreeDataTemplate DataType="models:CustomSetting" ItemsSource="{Binding InnerSettings}">
-              <StackPanel>
-                <TextBox Text="{Binding Name, Mode = TwoWay}" Foreground="MediumSlateBlue"/>
-                <TextBox Text="{Binding Value, Mode = TwoWay}" />
-              </StackPanel>
-            </TreeDataTemplate>
-
-            <TreeDataTemplate DataType="models:UniversalSetting" ItemsSource="{Binding InnerSettings}">
-              <StackPanel>
-                <TextBlock Text="{Binding Name}"/>
-                <TextBox Text="{Binding Value, Mode = TwoWay}" />
-              </StackPanel>
-            </TreeDataTemplate>
-          </TreeView.DataTemplates>
-        </TreeView>
+        <views:ConfigTreeView DataContext="{Binding}" Grid.Row="1"/>
         <Button Content="+  Custom Setting" Width="120" Grid.Row="2" Command="{Binding AddCustomSetting}"/>
       </Grid>
       <GridSplitter Grid.Column="1"/>
@@ -109,7 +72,28 @@
     <Style Selector="TreeViewItem > StackPanel > TextBlock">
       <Setter Property="Margin" Value="5"/>
     </Style>
-    
+    <Style Selector="TreeViewItem StackPanel > Button.hideInactive">
+      <Setter Property="Margin" Value="2,0,2,0"/>
+      <Setter Property="Padding" Value="2"/>
+      <Setter Property="FontSize" Value="10"/>
+      <Setter Property="IsVisible" Value="False"/>
+    </Style>
+
+    <Style Selector="TreeViewItem Button Image">
+      <Setter Property="Stretch" Value="None" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style Selector="TreeViewItem Button">
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+
+    <Style Selector="TreeViewItem:pointerover StackPanel > Button, TreeViewItem:selected StackPanel > Button">
+      <Setter Property="IsVisible" Value="True"/>
+    </Style>
+
     <Style Selector="TreeView TextBox">
       <Setter Property="BorderBrush" Value="AliceBlue"/>
     </Style>

@@ -29,16 +29,25 @@ namespace EthCanConfig.Models
                 {
                     TypedValue = StringToEnum<T>(value, default);
                 }
+                else if(typeof(T) == typeof(int))
+                {
+                    TypedValue = (T) Convert.ChangeType(int.Parse(value),typeof(T));
+                }
+                else if (typeof(T) == typeof(uint))
+                {
+                    TypedValue = (T)Convert.ChangeType(uint.Parse(value), typeof(T));
+                }
             }
         }
 
-        public IConfigurationSetting Parent { get; set; }
+        public IContainerSetting Parent { get; set; }
 
         public TypedSetting(string name, T value)
         {
             Name = name;
             TypedValue = value;
         }
+        public IConfigurationSetting Clone() => MemberwiseClone() as IConfigurationSetting;
 
         public TEnum StringToEnum<TEnum>(string value, TEnum defaultValue)
         {

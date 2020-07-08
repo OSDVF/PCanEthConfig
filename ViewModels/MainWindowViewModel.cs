@@ -11,25 +11,32 @@ namespace EthCanConfig.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
+        private static int canChannelsCount = 0;
         public string Greeting => "Welcome to Avalonia!";
         public IPAddress ConnectedDevice;
         public string ConnectedDeviceIP => ConnectedDevice == null ? "Unavaliable" : ConnectedDevice.ToString();
-        public ObservableCollection<IConfigurationSetting> Settings { get; } = new ObservableCollection<IConfigurationSetting>() {
+        public ContainerSetting SettingsObject = new ContainerSetting("configuration", new ChildObservableCollection<IConfigurationSetting>() {
             new StringSetting("logFile","ethCanRouter.log"),
             new EnumSetting("logLevel",LogLevel.normal),
             new ContainerSetting("net",new ChildObservableCollection<IConfigurationSetting>(new IConfigurationSetting[]{
                 new StringSetting("ip","10.10.53.200"),
                 new StringSetting("mask","255.0.0.0"),
                 new StringSetting("gateway","10.255.255.254"),
-                }))
-        };
+                })),
+            new AdditiveContainerSetting("channels",new SettingsTemplate(new ChildObservableCollection<IConfigurationSetting>(){
+                new StringSetting("name","can"+(canChannelsCount++).ToString()),
+                new NumberSetting("bitrate",250000)
+            }))
+
+        });
+        public ChildObservableCollection<IConfigurationSetting> Settings => SettingsObject.InnerSettings;
 
         public IConfigurationSetting SelectedSetting { get; set; }
 
         private void AddCustomSetting()
         {
             var newCustomSetting = new CustomSetting();
-            if(SelectedSetting == null|| SelectedSetting.Parent == null)
+            if(SelectedSetting == null)
             {//Add top level setting
                 Settings.Add(newCustomSetting);
             }

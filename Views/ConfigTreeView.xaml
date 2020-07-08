@@ -1,0 +1,125 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:EthCanConfig.Views;assembly=EthCanConfig"
+             xmlns:models="clr-namespace:EthCanConfig.Models;assembly=EthCanConfig"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EthCanConfig.Views.ConfigTreeView">
+  <TreeView Items="{Binding Settings}" SelectedItem="{Binding SelectedSetting, Mode=TwoWay}">
+    <TreeView.DataTemplates>
+      <DataTemplate DataType="models:EnumSetting">
+        <StackPanel Classes="inner">
+          <TextBlock Text="{Binding Name}" Foreground="Brown"/>
+          <DropDown Items="{Binding Values}" BorderBrush="AliceBlue" SelectedItem="{Binding TypedValue, Mode=TwoWay}"/>
+        </StackPanel>
+      </DataTemplate>
+
+      <DataTemplate DataType="models:StringSetting">
+        <StackPanel>
+          <TextBlock Text="{Binding Name}" Foreground="Crimson"/>
+          <TextBox Text="{Binding Value, Mode = TwoWay}" />
+        </StackPanel>
+      </DataTemplate>
+
+      <DataTemplate DataType="models:NumberSetting">
+        <StackPanel>
+          <TextBlock Text="{Binding Name}" Foreground="DodgerBlue"/>
+          <TextBox Text="{Binding StringValue, Mode = TwoWay}" />
+        </StackPanel>
+      </DataTemplate>
+
+      <DataTemplate DataType="models:UnsignedNumberSetting">
+        <StackPanel>
+          <TextBlock Text="{Binding Name}" Foreground="Green"/>
+          <TextBox Text="{Binding Value, Mode = TwoWay}" />
+        </StackPanel>
+      </DataTemplate>
+
+      <DataTemplate DataType="models:SettingsTemplate">
+        <StackPanel Orientation="Vertical">
+          <TreeView Items="{Binding InnerSettings}" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Classes="TemplatedTreeView">
+            <TreeView.Styles>
+              <Style Selector=".TemplatedTreeView > Border">
+                <Setter Property="BorderBrush" Value="Transparent"/>
+              </Style>
+            </TreeView.Styles>
+          </TreeView>
+          <StackPanel Orientation="Horizontal">
+            <Button Command="{Binding Delete}">
+              <Image Source="/Assets/delete.png"/>
+            </Button>
+            <Button Command="{Binding MoveForward}">
+              <Image Source="/Assets/down.png"/>
+            </Button>
+            <Button Command="{Binding MoveBack}">
+              <Image Source="/Assets/up.png"/>
+            </Button>
+          </StackPanel>
+        </StackPanel>
+      </DataTemplate>
+
+      <TreeDataTemplate DataType="models:AdditiveContainerSetting" ItemsSource="{Binding InnerSettings}">
+        <StackPanel>
+          <TextBlock Text="{Binding Name}" Foreground="Gray"/>
+          <Button Command="{Binding AddSetting}" >
+            <Image Source="/Assets/add.png"/>
+          </Button>
+          <Button Command="{Binding DeleteAll}" >
+            <Image Source="/Assets/delete.png"/>
+          </Button>
+        </StackPanel>
+      </TreeDataTemplate>
+
+      <TreeDataTemplate DataType="models:ContainerSetting" ItemsSource="{Binding InnerSettings}">
+        <StackPanel>
+          <TextBlock Text="{Binding Name}" Foreground="Gray"/>
+        </StackPanel>
+      </TreeDataTemplate>
+
+      <TreeDataTemplate DataType="models:CustomSetting" ItemsSource="{Binding InnerSettings}">
+        <StackPanel>
+          <TextBox Text="{Binding Name, Mode = TwoWay}" Foreground="MediumSlateBlue"/>
+          <TextBox Text="{Binding Value, Mode = TwoWay}" />
+
+          <Button Command="{Binding MoveForward}" Classes="hideInactive">
+            <Image Source="/Assets/down.png"/>
+          </Button>
+          <Button Command="{Binding MoveBack}" Classes="hideInactive">
+            <Image Source="/Assets/up.png"/>
+          </Button>
+          <Button Command="{Binding Delete}" Classes="hideInactive">
+            <Image Source="/Assets/delete.png"/>
+          </Button>
+        </StackPanel>
+      </TreeDataTemplate>
+
+      <TreeDataTemplate DataType="models:UniversalSetting" ItemsSource="{Binding InnerSettings}">
+        <StackPanel>
+          <TextBlock Text="{Binding Name}"/>
+          <TextBox Text="{Binding Value, Mode = TwoWay}" />
+        </StackPanel>
+      </TreeDataTemplate>
+    </TreeView.DataTemplates>
+    <TreeView.Styles>
+      <Style Selector="TreeViewItem:empty">
+        <Setter Property="Template">
+          <ControlTemplate>
+            <StackPanel>
+              <ContentPresenter Name="PART_HeaderPresenter"
+                                Focusable="False"
+                                Content="{TemplateBinding Header}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalAlignment}"
+                                Padding="{TemplateBinding Padding}"
+                                Margin="5,0,0,0"/>
+              <ItemsPresenter Name="PART_ItemsPresenter"
+                              IsVisible="{TemplateBinding IsExpanded}"
+                              Items="{TemplateBinding Items}"
+                              ItemsPanel="{TemplateBinding ItemsPanel}"/>
+            </StackPanel>
+          </ControlTemplate>
+        </Setter>
+      </Style>
+    </TreeView.Styles>
+  </TreeView>
+</UserControl>

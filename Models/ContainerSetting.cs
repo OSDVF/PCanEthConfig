@@ -27,8 +27,8 @@ namespace EthCanConfig.Models
 
     public class ChildObservableCollection<T> : ObservableCollection<T> where T: IConfigurationSetting
     {
-        private T _parent;
-        public T Parent { get => _parent; set
+        private IContainerSetting _parent;
+        public IContainerSetting Parent { get => _parent; set
             {
                 _parent = value;
                 foreach (var item in this)
@@ -37,7 +37,7 @@ namespace EthCanConfig.Models
                 }
             }
         }
-        public ChildObservableCollection(T parent) : base()
+        public ChildObservableCollection(IContainerSetting parent) : base()
         {
             Parent = parent;
         }
@@ -47,9 +47,20 @@ namespace EthCanConfig.Models
         public ChildObservableCollection(IEnumerable<T> collection) : base(collection)
         {
         }
-        public ChildObservableCollection(IEnumerable<T> collection, T parent) : base(collection)
+        public ChildObservableCollection(IEnumerable<T> collection, IContainerSetting parent) : base(collection)
         {
             Parent = parent;
+        }
+
+        protected override void InsertItem(int index, T item)
+        {
+            item.Parent = _parent;
+            base.InsertItem(index, item);
+        }
+        protected override void SetItem(int index, T item)
+        {
+            item.Parent = _parent;
+            base.SetItem(index, item);
         }
     }
 
