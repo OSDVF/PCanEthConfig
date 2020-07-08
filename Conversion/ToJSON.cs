@@ -29,7 +29,7 @@ namespace EthCanConfig.Conversion
         }
     }
 
-    class ConfigurationFormatter : IJsonFormatter<IConfigurationSetting>
+    public class ConfigurationFormatter : IJsonFormatter<IConfigurationSetting>
     {
         public virtual IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
         {
@@ -50,7 +50,7 @@ namespace EthCanConfig.Conversion
         }
     }
 
-    class TypedFormatter<T> : ConfigurationFormatter, IJsonFormatter<TypedSetting<T>>
+    public class TypedFormatter<T> : ConfigurationFormatter, IJsonFormatter<TypedSetting<T>>
     {
         public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
         {
@@ -65,6 +65,42 @@ namespace EthCanConfig.Conversion
         }
 
         TypedSetting<T> IJsonFormatter<TypedSetting<T>>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    public class NumberSettingFormatter : TypedFormatter<int>, IJsonFormatter<NumberSetting>
+    {
+        public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Serialize(ref JsonWriter writer, NumberSetting value, IJsonFormatterResolver formatterResolver)
+        {
+            base.Serialize(ref writer, value, formatterResolver);
+        }
+
+        NumberSetting IJsonFormatter<NumberSetting>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    public class UnsignedNumberSettingFormatter : TypedFormatter<uint>, IJsonFormatter<UnsignedNumberSetting>
+    {
+        public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Serialize(ref JsonWriter writer, UnsignedNumberSetting value, IJsonFormatterResolver formatterResolver)
+        {
+            base.Serialize(ref writer, value, formatterResolver);
+        }
+
+        UnsignedNumberSetting IJsonFormatter<UnsignedNumberSetting>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
         {
             throw new System.NotImplementedException();
         }
@@ -127,7 +163,14 @@ namespace EthCanConfig.Conversion
         {
             foreach (var inner in value.InnerSettings)
             {
-                dynamic genericFormatter = formatterResolver.GetFormatterDynamic(inner.GetType());
+                dynamic genericFormatter;
+
+                if (inner is HardCodedSetting)
+                    genericFormatter = formatterResolver.GetFormatterWithVerify<StringSetting>();
+
+                else
+                    genericFormatter = formatterResolver.GetFormatterDynamic(inner.GetType());
+
                 if (inner is StringSetting typed)
                 {
                     genericFormatter.Serialize(ref writer, typed, formatterResolver);
@@ -136,6 +179,10 @@ namespace EthCanConfig.Conversion
                 {
                     genericFormatter.Serialize(ref writer, num, formatterResolver);
                 }
+                else if (inner is UnsignedNumberSetting unum)
+                {
+                    genericFormatter.Serialize(ref writer, unum, formatterResolver);
+                }
                 else if (inner is AdditiveContainerSetting adt)
                 {
                     genericFormatter.Serialize(ref writer, adt, formatterResolver);
@@ -143,6 +190,10 @@ namespace EthCanConfig.Conversion
                 else if (inner is MultipleAdditiveContainerSetting mlt)
                 {
                     genericFormatter.Serialize(ref writer, mlt, formatterResolver);
+                }
+                else if (inner is SettingsTemplate tmp)
+                {
+                    genericFormatter.Serialize(ref writer, tmp, formatterResolver);
                 }
                 else if (inner is ContainerSetting cnt)
                 {
@@ -181,7 +232,7 @@ namespace EthCanConfig.Conversion
         }
     }
 
-    class MultipleAdditiveContainerFormatter : AdditiveContainerFormatter, IJsonFormatter<MultipleAdditiveContainerSetting>
+    class MultipleAdditiveContainerFormatter : ContainerConfigurationFormatter, IJsonFormatter<MultipleAdditiveContainerSetting>
     {
         public override ContainerSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
         {
@@ -190,10 +241,36 @@ namespace EthCanConfig.Conversion
 
         public void Serialize(ref JsonWriter writer, MultipleAdditiveContainerSetting value, IJsonFormatterResolver formatterResolver)
         {
-            base.Serialize(ref writer, value, formatterResolver);
+            if (!string.IsNullOrEmpty(value.Name))
+                writer.WritePropertyName(value.Name);
+            writer.WriteBeginArray();
+            WriteInnerSettings(ref writer, value, formatterResolver);
+            writer.WriteEndArray();
+            ConfigurationFormatter.WriteSeparatorIfNotTheLast(ref writer, value);
         }
 
         MultipleAdditiveContainerSetting IJsonFormatter<MultipleAdditiveContainerSetting>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    class SettingsTemplateFormatter : ContainerConfigurationFormatter, IJsonFormatter<SettingsTemplate>
+    {
+        public override ContainerSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Serialize(ref JsonWriter writer, SettingsTemplate value, IJsonFormatterResolver formatterResolver)
+        {
+            writer.WriteBeginObject();
+            WriteInnerSettings(ref writer, value, formatterResolver);
+            writer.WriteEndObject();
+            ConfigurationFormatter.WriteSeparatorIfNotTheLast(ref writer, value);
+        }
+
+        SettingsTemplate IJsonFormatter<SettingsTemplate>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
         {
             throw new System.NotImplementedException();
         }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Runtime.Serialization;
 using System.Text;
 using Utf8Json;
@@ -67,6 +68,11 @@ namespace EthCanConfig.Models
         {
             item.Parent = _parent;
             base.SetItem(index, item);
+        }
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            _parent?.Parent?.InnerSettings?.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            base.OnCollectionChanged(e);
         }
     }
 

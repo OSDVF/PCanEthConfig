@@ -7,19 +7,19 @@ using Utf8Json;
 
 namespace EthCanConfig.Models
 {
-    [JsonFormatter(typeof(TypedFormatter<int>))]
-    class NumberSetting : TypedSetting<int>
+    [JsonFormatter(typeof(NumberSettingFormatter))]
+    public class NumberSetting : TypedSetting<int>
     {
         public NumberSetting(string name, int value) : base(name, value)
         {
         }
     }
-    [JsonFormatter(typeof(TypedFormatter<uint>))]
-    class UnsignedNumberSetting : TypedSetting<uint>
+    [JsonFormatter(typeof(UnsignedNumberSettingFormatter))]
+    public class UnsignedNumberSetting : TypedSetting<uint>
     {
         public UnsignedNumberSetting(string name, uint value) : base(name, value) { }
     }
-    class HexadecimalSetting : UnsignedNumberSetting
+    public class HexadecimalSetting : UnsignedNumberSetting
     {
         [IgnoreDataMember]
         public int Length;
