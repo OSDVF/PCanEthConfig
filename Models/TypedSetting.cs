@@ -13,11 +13,11 @@ namespace EthCanConfig.Models
             get { return TypedValue; }
             set
             {
-                TypedValue = (T)value;
+                TypedValue = (T) Convert.ChangeType(value,typeof(T));
             }
         }
         public T TypedValue { get; set; }
-        public string StringValue
+        public virtual string StringValue
         {
             get
             {
@@ -41,7 +41,19 @@ namespace EthCanConfig.Models
         }
 
         public IContainerSetting Parent { get; set; }
-
+        private bool _isRequired = true;
+        public bool IsRequired
+        {
+            get => _isRequired; set
+            {
+                if (value)
+                {
+                    IsEnabled = true;
+                }
+                _isRequired = value;
+            }
+        }
+        public bool IsEnabled { get; set; } = true;
         public TypedSetting(string name, T value)
         {
             Name = name;

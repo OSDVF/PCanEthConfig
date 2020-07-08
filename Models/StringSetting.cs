@@ -9,4 +9,9 @@ namespace EthCanConfig.Models
         public StringSetting(string name, string value):base(name,value)
         { }
     }
+    public class RegexSetting : StringSetting
+    {
+        public RegexSetting(string name, string value) : base(name, value)
+        { }
+    }
 }

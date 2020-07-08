@@ -25,9 +25,71 @@ namespace EthCanConfig.ViewModels
                 })),
             new AdditiveContainerSetting("channels",new SettingsTemplate(new ChildObservableCollection<IConfigurationSetting>(){
                 new StringSetting("name","can"+(canChannelsCount++).ToString()),
-                new NumberSetting("bitrate",250000)
-            }))
+                new UnsignedNumberSetting("bitrate",250000)
+            })),
+            new MultipleAdditiveContainerSetting("routes",new Collection<SettingsTemplate>(){
+                new SettingsTemplate("Ethernet->CAN",new ChildObservableCollection<IConfigurationSetting>()
+                {
+                    new StringSetting("name",string.Empty){IsRequired=false, IsEnabled=false},
+                    new HardCodedSetting("type",RouteType.canin),
+                    new AdditiveContainerSetting("listeners",new SettingsTemplate(new ChildObservableCollection<IConfigurationSetting>(){
+                        new StringSetting("channel","can0"),
+                        new HexadecimalSetting("filter",0x1FFFFFFF,8){ IsEnabled=false,IsRequired=false},
+                        new HexadecimalSetting("filterMask",0x1FFFFFFF,8){ IsEnabled=false,IsRequired=false},
+                        new ContainerSetting("converters",new ChildObservableCollection<IConfigurationSetting>(){
+                            new MultipleAdditiveContainerSetting("input",new Collection<SettingsTemplate>()
+                            {
+                                new SettingsTemplate("Plain",new ChildObservableCollection<IConfigurationSetting>()
+                                {
+                                    new StringSetting("name","plainParser"){ IsRequired = false },
+                                }),
+                                new SettingsTemplate("Scanf",new ChildObservableCollection<IConfigurationSetting>()
+                                {
+                                    new StringSetting("name","scanfParser"){ IsRequired = false },
+                                    new StringSetting("scanf","%d,%d"),
+                                    new NumberArraySetting("shuffle"){IsRequired=false,IsEnabled = false},
+                                }),
+                                new SettingsTemplate("Separator",new ChildObservableCollection<IConfigurationSetting>()
+                                {
+                                    new StringSetting("name","separatorParser"){ IsRequired = false },
+                                    new StringSetting("separator",","),
+                                    new NumberArraySetting("shuffle"){IsRequired=false,IsEnabled = false},
+                                }),
+                                new SettingsTemplate("Regex",new ChildObservableCollection<IConfigurationSetting>()
+                                {
+                                    new StringSetting("name","regexParser"){ IsRequired = false },
+                                    new RegexSetting("regex","/.*/"),
+                                    new NumberArraySetting("shuffle"){IsRequired=false,IsEnabled = false},
+                                }),
+                                new SettingsTemplate("Bit Separator",new ChildObservableCollection<IConfigurationSetting>()
+                                {
+                                    new StringSetting("name","plainParser"){ IsRequired = false },
+                                    new StringSetting("bits","0-24u,25-32"),
+                                    new EnumSetting("byteOrder",ByteOrder.bigEndian),
+                                    new EnumSetting("bitOrder",BitOrder.MSB),
+                                    new NumberArraySetting("shuffle"){IsRequired=false,IsEnabled = false},
+                                }),
+                            })
+                        })
+                    })){IsRequired=false}
+                }),
+                new SettingsTemplate("CAN->Ethernet",new ChildObservableCollection<IConfigurationSetting>()
+                {
+                    new StringSetting("name",string.Empty){IsRequired=false, IsEnabled=false},
+                    new HardCodedSetting("type",RouteType.canout),
+                    new AdditiveContainerSetting("listeners",new SettingsTemplate(new ChildObservableCollection<IConfigurationSetting>(){
+                        new UnsignedNumberSetting("port",1234),
+                        new EnumSetting("protocol",Protocol.udp),
+                        new RegexSetting("startsWith","$PMACO"){ IsEnabled=false,IsRequired=false},
+                        new RegexSetting("endsWith","/\\*[0-9a-fA-F]+/"){ IsEnabled=false,IsRequired=false},
+                        new BoolSetting("includeBorders",false),
+                        new RegexSetting("filter","/.*/"){ IsEnabled=false,IsRequired=false},
+                        new ContainerSetting("converters",new ChildObservableCollection<IConfigurationSetting>(){
 
+                        })
+                    })){IsRequired=false}
+                })
+            })
         });
         public ChildObservableCollection<IConfigurationSetting> Settings => SettingsObject.InnerSettings;
 
@@ -36,7 +98,7 @@ namespace EthCanConfig.ViewModels
         private void AddCustomSetting()
         {
             var newCustomSetting = new CustomSetting();
-            if(SelectedSetting == null)
+            if (SelectedSetting == null)
             {//Add top level setting
                 Settings.Add(newCustomSetting);
             }
@@ -49,7 +111,7 @@ namespace EthCanConfig.ViewModels
                 }
                 else
                 {
-                    if(SelectedSetting is IContainerSetting)
+                    if (SelectedSetting is IContainerSetting)
                     {
                         (SelectedSetting as IContainerSetting).InnerSettings.Add(newCustomSetting);
                     }

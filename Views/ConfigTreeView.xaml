@@ -6,7 +6,7 @@
              xmlns:models="clr-namespace:EthCanConfig.Models;assembly=EthCanConfig"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="EthCanConfig.Views.ConfigTreeView">
-  <TreeView Items="{Binding Settings}" SelectedItem="{Binding SelectedSetting, Mode=TwoWay}">
+  <TreeView Items="{Binding Settings}" SelectedItem="{Binding SelectedSetting, Mode=OneWayToSource}" x:Name="mainTreeView">
     <TreeView.DataTemplates>
       <DataTemplate DataType="models:EnumSetting">
         <StackPanel Classes="inner">
@@ -19,6 +19,13 @@
         <StackPanel>
           <TextBlock Text="{Binding Name}" Foreground="Crimson"/>
           <TextBox Text="{Binding Value, Mode = TwoWay}" />
+        </StackPanel>
+      </DataTemplate>
+
+      <DataTemplate DataType="models:HexadecimalSetting">
+        <StackPanel>
+          <TextBlock Text="{Binding Name}" Foreground="Green"/>
+          <TextBox Text="{Binding StringValue, Mode = TwoWay}" />
         </StackPanel>
       </DataTemplate>
 
@@ -38,7 +45,10 @@
 
       <DataTemplate DataType="models:SettingsTemplate">
         <StackPanel Orientation="Vertical">
-          <TreeView Items="{Binding InnerSettings}" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Classes="TemplatedTreeView">
+          <TreeView Items="{Binding InnerSettings}" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    Classes="TemplatedTreeView"
+                    SelectedItem="{Binding DataContext.SelectedSetting, Mode=OneWayToSource, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:ConfigTreeView}}}"
+                    SelectionChanged="innerSelectionChanged">
             <TreeView.Styles>
               <Style Selector=".TemplatedTreeView > Border">
                 <Setter Property="BorderBrush" Value="Transparent"/>
@@ -46,7 +56,7 @@
             </TreeView.Styles>
           </TreeView>
           <StackPanel Orientation="Horizontal">
-            <Button Command="{Binding Delete}">
+            <Button Command="{Binding DeleteItem}">
               <Image Source="/Assets/delete.png"/>
             </Button>
             <Button Command="{Binding MoveForward}">
@@ -71,6 +81,19 @@
         </StackPanel>
       </TreeDataTemplate>
 
+      <TreeDataTemplate DataType="models:MultipleAdditiveContainerSetting" ItemsSource="{Binding InnerSettings}">
+        <StackPanel>
+          <TextBlock Text="{Binding Name}" Foreground="Gray"/>
+          <Button Command="{Binding AddSetting}" Margin="0" >
+            <Image Source="/Assets/add.png"/>
+          </Button>
+          <DropDown Items="{Binding ItemTemplateNames}" SelectedItem="{Binding SelectedTemplateName}" VerticalAlignment="Top" Margin="0,0,5,0"/>
+          <Button Command="{Binding DeleteAll}" >
+            <Image Source="/Assets/delete.png"/>
+          </Button>
+        </StackPanel>
+      </TreeDataTemplate>
+
       <TreeDataTemplate DataType="models:ContainerSetting" ItemsSource="{Binding InnerSettings}">
         <StackPanel>
           <TextBlock Text="{Binding Name}" Foreground="Gray"/>
@@ -88,9 +111,17 @@
           <Button Command="{Binding MoveBack}" Classes="hideInactive">
             <Image Source="/Assets/up.png"/>
           </Button>
-          <Button Command="{Binding Delete}" Classes="hideInactive">
+          <Button Command="{Binding DeleteItem}" Classes="hideInactive">
             <Image Source="/Assets/delete.png"/>
           </Button>
+        </StackPanel>
+      </TreeDataTemplate>
+
+      <TreeDataTemplate DataType="models:HardCodedSetting" ItemsSource="{Binding InnerSettings}">
+        <StackPanel>
+          <Image Source="/Assets/lock.png" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+          <TextBlock Text="{Binding Name, Mode = OneWay}"/>
+          <TextBlock Text="{Binding Value, Mode = OneWay}" />
         </StackPanel>
       </TreeDataTemplate>
 
@@ -100,18 +131,23 @@
           <TextBox Text="{Binding Value, Mode = TwoWay}" />
         </StackPanel>
       </TreeDataTemplate>
+
     </TreeView.DataTemplates>
     <TreeView.Styles>
       <Style Selector="TreeViewItem:empty">
         <Setter Property="Template">
           <ControlTemplate>
             <StackPanel>
-              <ContentPresenter Name="PART_HeaderPresenter"
-                                Focusable="False"
-                                Content="{TemplateBinding Header}"
-                                HorizontalContentAlignment="{TemplateBinding HorizontalAlignment}"
-                                Padding="{TemplateBinding Padding}"
-                                Margin="5,0,0,0"/>
+              <Border Name="SelectionBorder"
+                      Focusable="True"
+                      TemplatedControl.IsTemplateFocusTarget="True">
+                <ContentPresenter Name="PART_HeaderPresenter"
+                                  Focusable="False"
+                                  Content="{TemplateBinding Header}"
+                                  HorizontalContentAlignment="{TemplateBinding HorizontalAlignment}"
+                                  Padding="{TemplateBinding Padding}"
+                                  Margin="5,0,0,0"/>
+              </Border>
               <ItemsPresenter Name="PART_ItemsPresenter"
                               IsVisible="{TemplateBinding IsExpanded}"
                               Items="{TemplateBinding Items}"

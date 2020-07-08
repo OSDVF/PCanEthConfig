@@ -26,21 +26,41 @@ namespace EthCanConfig.Models
         {
             var clone = MemberwiseClone() as UniversalSetting;
             var innerSettings = new ChildObservableCollection<IConfigurationSetting>(clone);
-            foreach(var setting in InnerSettings)
+            foreach (var setting in InnerSettings)
             {
                 innerSettings.Add(setting.Clone());
             }
             clone.InnerSettings = innerSettings;
             return clone;
         }
+        private bool _isRequired = true;
+        public bool IsRequired
+        {
+            get => _isRequired; set
+            {
+                if(value)
+                {
+                    IsEnabled = true;
+                }
+                _isRequired = value;
+            }
+        }
+        public bool IsEnabled { get; set; } = true;
+    }
 
+    public class HardCodedSetting : UniversalSetting
+    {
+        public HardCodedSetting(string name, dynamic value) : base(name, (object)value)
+        { }
     }
 
     public interface IConfigurationSetting
     {
         string Name { get; set; }
-        abstract object Value {  get; set; }
+        abstract object Value { get; set; }
         IContainerSetting Parent { get; set; }
         IConfigurationSetting Clone();
+        bool IsRequired { get; set; }
+        bool IsEnabled { get; set; }
     }
 }

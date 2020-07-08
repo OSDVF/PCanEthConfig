@@ -41,6 +41,8 @@
       <TextBlock Text="Container" />
       <Panel Background="MediumSlateBlue"/>
       <TextBlock Text="Custom" />
+      <Image Source="/Assets/lock.png" Width="10" Height="10" Margin="0,0,5,0"/>
+      <TextBlock Text="Locked Value" />
       <Panel Background="Black"/>
       <TextBlock Text="Unknown" />
     </WrapPanel>
@@ -73,9 +75,6 @@
       <Setter Property="Margin" Value="5"/>
     </Style>
     <Style Selector="TreeViewItem StackPanel > Button.hideInactive">
-      <Setter Property="Margin" Value="2,0,2,0"/>
-      <Setter Property="Padding" Value="2"/>
-      <Setter Property="FontSize" Value="10"/>
       <Setter Property="IsVisible" Value="False"/>
     </Style>
 
@@ -86,6 +85,9 @@
     </Style>
 
     <Style Selector="TreeViewItem Button">
+      <Setter Property="Margin" Value="2,0,2,0"/>
+      <Setter Property="Padding" Value="2"/>
+      <Setter Property="FontSize" Value="10"/>
       <Setter Property="HorizontalAlignment" Value="Center" />
       <Setter Property="VerticalAlignment" Value="Top" />
     </Style>
