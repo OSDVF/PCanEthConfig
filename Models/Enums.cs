@@ -24,4 +24,8 @@ namespace EthCanConfig.Models
     {
         MSB,LSB
     }
+    enum MaskOperations
+    {
+        AND,OR
+    }
 }

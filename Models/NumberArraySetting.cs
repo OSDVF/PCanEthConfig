@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
 namespace EthCanConfig.Models
 {
-    class NumberArraySetting : TypedSetting<int[]>
+    class NumberArraySetting<T> : TypedSetting<T[]>
     {
+        public string FancyName => "[ " + Name + " ]";
         public override string StringValue
         {
             get
             {
+                if (TypedValue == null||TypedValue.Length == 0)
+                    return string.Empty;
+
                 StringBuilder stringBuilder = new StringBuilder(5);
                 foreach (var number in TypedValue)
                 {
@@ -23,11 +28,11 @@ namespace EthCanConfig.Models
             }
             set
             {
-                string[] tokens = RemoveWhitespace(value).Split(',');
-                int[] result = new int[tokens.Length];
+                string[] tokens = RemoveWhitespace(value).Split(',',StringSplitOptions.RemoveEmptyEntries);
+                T[] result = new T[tokens.Length];
                 for(int i = 0;i<tokens.Length;i++)
                 {
-                    result[i] = int.Parse(tokens[i]);
+                    result[i] = (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(tokens[i]);
                 }
                 TypedValue = result;
             }
@@ -42,7 +47,29 @@ namespace EthCanConfig.Models
         public NumberArraySetting(string name) : base(name, null)
         {
         }
-        public NumberArraySetting(string name, int[] values) : base(name, values)
+        public NumberArraySetting(string name, T[] values) : base(name, values)
+        {
+        }
+    }
+
+    class SignedNumberArraySetting : NumberArraySetting<int>
+    {
+        public SignedNumberArraySetting(string name) : base(name)
+        {
+        }
+
+        public SignedNumberArraySetting(string name, int[] values) : base(name, values)
+        {
+        }
+    }
+
+    class UnsignedNumberArraySetting : NumberArraySetting<uint>
+    {
+        public UnsignedNumberArraySetting(string name) : base(name)
+        {
+        }
+
+        public UnsignedNumberArraySetting(string name, uint[] values) : base(name, values)
         {
         }
     }

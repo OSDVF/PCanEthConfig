@@ -5,7 +5,7 @@ namespace EthCanConfig.Models
 {
     public class TypedSetting<T> : ReactiveObject, IConfigurationSetting
     {
-        public string Name { get; set; }
+        public virtual string Name { get; set; }
         public object Value
         {
             get { return TypedValue; }

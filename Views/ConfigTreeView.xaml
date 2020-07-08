@@ -59,6 +59,24 @@
         </StackPanel>
       </DataTemplate>
 
+      <DataTemplate DataType="models:UnsignedNumberArraySetting">
+        <StackPanel>
+          <TextBlock Text="{Binding FancyName}" Foreground="Green" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+          <TextBox Text="{Binding StringValue, Mode = TwoWay}" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+
+          <ContentPresenter ContentTemplate="{StaticResource notRequiredCheckbox}" Content="{Binding}"/>
+        </StackPanel>
+      </DataTemplate>
+
+      <DataTemplate DataType="models:SignedNumberArraySetting">
+        <StackPanel>
+          <TextBlock Text="{Binding FancyName}" Foreground="DodgerBlue" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+          <TextBox Text="{Binding StringValue, Mode = TwoWay}" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+
+          <ContentPresenter ContentTemplate="{StaticResource notRequiredCheckbox}" Content="{Binding}"/>
+        </StackPanel>
+      </DataTemplate>
+
       <DataTemplate DataType="models:SettingsTemplate">
         <StackPanel Orientation="Vertical">
           <TreeView Items="{Binding InnerSettings}" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
