@@ -1,11 +1,13 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using EthCanConfig.Conversion;
 
 namespace EthCanConfig.Views
 {
     public class MainWindow : Window
     {
+        private TextBox previewTextBox;
         public MainWindow()
         {
             InitializeComponent();
@@ -17,6 +19,7 @@ namespace EthCanConfig.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+            previewTextBox = this.FindControl<TextBox>("previewTextBox");
         }
     }
 

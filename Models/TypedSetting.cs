@@ -1,5 +1,8 @@
-﻿using ReactiveUI;
+﻿using EthCanConfig.Conversion;
+using ReactiveUI;
 using System;
+using System.Runtime.Serialization;
+using Utf8Json;
 
 namespace EthCanConfig.Models
 {
@@ -11,10 +14,12 @@ namespace EthCanConfig.Models
             get { return TypedValue; }
             set
             {
-                TypedValue = (T) Convert.ChangeType(value,typeof(T));
+                TypedValue = (T)Convert.ChangeType(value, typeof(T));
             }
         }
+        [IgnoreDataMember]
         public T TypedValue { get; set; }
+        [IgnoreDataMember]
         public virtual string StringValue
         {
             get
@@ -27,9 +32,9 @@ namespace EthCanConfig.Models
                 {
                     TypedValue = StringToEnum<T>(value, default);
                 }
-                else if(typeof(T) == typeof(int))
+                else if (typeof(T) == typeof(int))
                 {
-                    TypedValue = (T) Convert.ChangeType(int.Parse(value),typeof(T));
+                    TypedValue = (T)Convert.ChangeType(int.Parse(value), typeof(T));
                 }
                 else if (typeof(T) == typeof(uint))
                 {
@@ -37,11 +42,13 @@ namespace EthCanConfig.Models
                 }
             }
         }
-
+        [IgnoreDataMember]
         public IContainerSetting Parent { get; set; }
+        [IgnoreDataMember]
         private bool _isRequired = true;
+        [IgnoreDataMember]
         private bool _isEnabled = true;
-
+        [IgnoreDataMember]
         public bool IsRequired
         {
             get => _isRequired; set
@@ -53,6 +60,7 @@ namespace EthCanConfig.Models
                 _isRequired = value;
             }
         }
+        [IgnoreDataMember]
         public bool IsEnabled
         {
             get => _isEnabled; set

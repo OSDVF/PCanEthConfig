@@ -1,8 +1,11 @@
-﻿using System;
+﻿using EthCanConfig.Conversion;
+using System;
 using System.Collections.ObjectModel;
+using Utf8Json;
 
 namespace EthCanConfig.Models
 {
+    [JsonFormatter(typeof(EnumSettingFormatter))]
     public class EnumSetting : TypedSetting<Enum>, IConfigurationSetting
     {
         public Array Values => Enum.GetValues(TypedValue.GetType());

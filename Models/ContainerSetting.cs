@@ -1,10 +1,14 @@
-﻿using System;
+﻿using EthCanConfig.Conversion;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime.Serialization;
 using System.Text;
+using Utf8Json;
 
 namespace EthCanConfig.Models
 {
+    [JsonFormatter(typeof(ContainerConfigurationFormatter))]
     public class ContainerSetting : UniversalSetting
     {
         public override object Value { get => InnerSettings; set => InnerSettings = value as ChildObservableCollection<IConfigurationSetting>; }
@@ -27,7 +31,9 @@ namespace EthCanConfig.Models
 
     public class ChildObservableCollection<T> : ObservableCollection<T> where T: IConfigurationSetting
     {
+        [IgnoreDataMember]
         private IContainerSetting _parent;
+        [IgnoreDataMember]
         public IContainerSetting Parent { get => _parent; set
             {
                 _parent = value;
@@ -64,7 +70,7 @@ namespace EthCanConfig.Models
         }
     }
 
-    public interface IContainerSetting
+    public interface IContainerSetting: IConfigurationSetting
     {
         ChildObservableCollection<IConfigurationSetting> InnerSettings { get; }
     }

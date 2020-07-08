@@ -1,14 +1,20 @@
-﻿using MessageBox.Avalonia;
+﻿using EthCanConfig.Conversion;
+using MessageBox.Avalonia;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
+using Utf8Json;
 
 namespace EthCanConfig.Models
 {
+    [JsonFormatter(typeof(MultipleAdditiveContainerFormatter))]
     class MultipleAdditiveContainerSetting : ContainerSetting
     {
+        [IgnoreDataMember]
         public ICollection<SettingsTemplate> ItemTemplates;
+        [IgnoreDataMember]
         public ICollection<string> ItemTemplateNames
         {
             get
@@ -21,7 +27,9 @@ namespace EthCanConfig.Models
                 return stringNames;
             }
         }
+        [IgnoreDataMember]
         public SettingsTemplate SelectedTemplate { get; set; }
+        [IgnoreDataMember]
         public string SelectedTemplateName
         {
             get
@@ -38,6 +46,9 @@ namespace EthCanConfig.Models
                     }
                 }
             }
+        }
+        public MultipleAdditiveContainerSetting(string name, ChildObservableCollection<IConfigurationSetting> innerSettings) : base(name, innerSettings)
+        {
         }
         public MultipleAdditiveContainerSetting(string name, ICollection<SettingsTemplate> itemTemplates) : base(name, new ChildObservableCollection<IConfigurationSetting>())
         {

@@ -4,14 +4,19 @@ using System.Text;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using ReactiveUI;
+using System.Runtime.Serialization;
+using Utf8Json;
+using EthCanConfig.Conversion;
 
 namespace EthCanConfig.Models
 {
+    [JsonFormatter(typeof(ConfigurationFormatter))]
     public class UniversalSetting : ReactiveObject, IConfigurationSetting, IContainerSetting
     {
         public string Name { get; set; }
         public virtual dynamic Value { get; set; }
         public ChildObservableCollection<IConfigurationSetting> InnerSettings { get; set; } = new ChildObservableCollection<IConfigurationSetting>();
+        [IgnoreDataMember]
         public IContainerSetting Parent { get; set; }
         public UniversalSetting(string name, dynamic value)
         {
@@ -35,9 +40,11 @@ namespace EthCanConfig.Models
             clone.InnerSettings = innerSettings;
             return clone;
         }
+        [IgnoreDataMember]
         private bool _isRequired = true;
+        [IgnoreDataMember]
         private bool _isEnabled = true;
-
+        [IgnoreDataMember]
         public bool IsRequired
         {
             get => _isRequired; set
@@ -49,6 +56,7 @@ namespace EthCanConfig.Models
                 _isRequired = value;
             }
         }
+        [IgnoreDataMember]
         public bool IsEnabled { get => _isEnabled; set
             {
                 _isEnabled = value;
@@ -63,6 +71,7 @@ namespace EthCanConfig.Models
         { }
     }
 
+    [JsonFormatter(typeof(ConfigurationFormatter))]
     public interface IConfigurationSetting
     {
         string Name { get; set; }

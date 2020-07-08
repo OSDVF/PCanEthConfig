@@ -1,21 +1,27 @@
-﻿using System;
+﻿using EthCanConfig.Conversion;
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
+using Utf8Json;
 
 namespace EthCanConfig.Models
 {
+    [JsonFormatter(typeof(TypedFormatter<int>))]
     class NumberSetting : TypedSetting<int>
     {
         public NumberSetting(string name, int value) : base(name, value)
         {
         }
     }
+    [JsonFormatter(typeof(TypedFormatter<uint>))]
     class UnsignedNumberSetting : TypedSetting<uint>
     {
         public UnsignedNumberSetting(string name, uint value) : base(name, value) { }
     }
     class HexadecimalSetting : UnsignedNumberSetting
     {
+        [IgnoreDataMember]
         public int Length;
         /// <summary>
         /// 
@@ -26,7 +32,7 @@ namespace EthCanConfig.Models
         public HexadecimalSetting(string name, uint value, int length) : base(name, value) {
             Length = length;
         }
-        [HexValidation]
+        [HexValidation,IgnoreDataMember]
         public override string StringValue
         {
             get

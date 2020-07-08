@@ -61,11 +61,11 @@
           <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock FontWeight="Bold" Text="Visual Editor" Margin="7" Grid.Row="0"/>
-        <views:ConfigTreeView DataContext="{Binding}" Grid.Row="1"/>
+        <views:ConfigTreeView DataContext="{Binding}" Grid.Row="1" />
         <Button Content="+  Custom Setting" Width="120" Grid.Row="2" Command="{Binding AddCustomSetting}"/>
       </Grid>
       <GridSplitter Grid.Column="1"/>
-      <TextBlock Grid.Column="2" Text="Configuration file preview"  Margin="7"></TextBlock>
+      <TextBox Grid.Column="2" Text="{Binding JSONPreview}"  Margin="7" IsReadOnly="True" x:Name="previewTextBox"></TextBox>
     </Grid>
   </DockPanel>
   <Window.Styles>

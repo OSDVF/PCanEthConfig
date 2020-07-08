@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace EthCanConfig.Models
 {
     class NumberArraySetting<T> : TypedSetting<T[]>
     {
+        [IgnoreDataMember]
         public string FancyName => "[ " + Name + " ]";
+        [IgnoreDataMember]
         public override string StringValue
         {
             get
