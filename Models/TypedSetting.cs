@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
+﻿using ReactiveUI;
+using System;
 
 namespace EthCanConfig.Models
 {
-    public class TypedSetting<T> : IConfigurationSetting
+    public class TypedSetting<T> : ReactiveObject, IConfigurationSetting
     {
         public string Name { get; set; }
         public object Value
@@ -42,6 +40,8 @@ namespace EthCanConfig.Models
 
         public IContainerSetting Parent { get; set; }
         private bool _isRequired = true;
+        private bool _isEnabled = true;
+
         public bool IsRequired
         {
             get => _isRequired; set
@@ -53,7 +53,14 @@ namespace EthCanConfig.Models
                 _isRequired = value;
             }
         }
-        public bool IsEnabled { get; set; } = true;
+        public bool IsEnabled
+        {
+            get => _isEnabled; set
+            {
+                _isEnabled = value;
+                this.RaiseAndSetIfChanged(ref _isEnabled, value);
+            }
+        }
         public TypedSetting(string name, T value)
         {
             Name = name;

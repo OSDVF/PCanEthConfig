@@ -7,39 +7,55 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="EthCanConfig.Views.ConfigTreeView">
   <TreeView Items="{Binding Settings}" SelectedItem="{Binding SelectedSetting, Mode=OneWayToSource}" x:Name="mainTreeView">
+    <TreeView.Resources>
+      <DataTemplate x:Key="notRequiredCheckbox">
+        <CheckBox IsChecked="{Binding IsEnabled, Mode=TwoWay}" IsVisible="{Binding !IsRequired}" Checked="OnCheckBoxCheck" Unchecked="OnCheckBoxUncheck" />
+      </DataTemplate>
+      <views:EnabledToOpacityConverter x:Key="etoConv"/>
+    </TreeView.Resources>
     <TreeView.DataTemplates>
       <DataTemplate DataType="models:EnumSetting">
         <StackPanel Classes="inner">
-          <TextBlock Text="{Binding Name}" Foreground="Brown"/>
-          <DropDown Items="{Binding Values}" BorderBrush="AliceBlue" SelectedItem="{Binding TypedValue, Mode=TwoWay}"/>
+          <TextBlock Text="{Binding Name}" Foreground="Brown" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+          <DropDown Items="{Binding Values}" BorderBrush="AliceBlue" SelectedItem="{Binding TypedValue, Mode=TwoWay}" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+          
+          <ContentPresenter ContentTemplate="{StaticResource ResourceKey=notRequiredCheckbox}" />
         </StackPanel>
       </DataTemplate>
 
       <DataTemplate DataType="models:StringSetting">
         <StackPanel>
-          <TextBlock Text="{Binding Name}" Foreground="Crimson"/>
-          <TextBox Text="{Binding Value, Mode = TwoWay}" />
+          <TextBlock Text="{Binding Name}" Foreground="Crimson" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+          <TextBox Text="{Binding Value, Mode = TwoWay}" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+
+          <ContentPresenter ContentTemplate="{StaticResource notRequiredCheckbox}" Content="{Binding}"/>
         </StackPanel>
       </DataTemplate>
 
       <DataTemplate DataType="models:HexadecimalSetting">
         <StackPanel>
-          <TextBlock Text="{Binding Name}" Foreground="Green"/>
-          <TextBox Text="{Binding StringValue, Mode = TwoWay}" />
+          <TextBlock Text="{Binding Name}" Foreground="Green" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+          <TextBox Text="{Binding StringValue, Mode = TwoWay}" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+
+          <ContentPresenter ContentTemplate="{StaticResource notRequiredCheckbox}" Content="{Binding}"/>
         </StackPanel>
       </DataTemplate>
 
       <DataTemplate DataType="models:NumberSetting">
         <StackPanel>
-          <TextBlock Text="{Binding Name}" Foreground="DodgerBlue"/>
-          <TextBox Text="{Binding StringValue, Mode = TwoWay}" />
+          <TextBlock Text="{Binding Name}" Foreground="DodgerBlue" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+          <TextBox Text="{Binding StringValue, Mode = TwoWay}" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+
+          <ContentPresenter ContentTemplate="{StaticResource notRequiredCheckbox}" Content="{Binding}"/>
         </StackPanel>
       </DataTemplate>
 
       <DataTemplate DataType="models:UnsignedNumberSetting">
         <StackPanel>
-          <TextBlock Text="{Binding Name}" Foreground="Green"/>
-          <TextBox Text="{Binding Value, Mode = TwoWay}" />
+          <TextBlock Text="{Binding Name}" Foreground="Green" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+          <TextBox Text="{Binding Value, Mode = TwoWay}" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+
+          <ContentPresenter ContentTemplate="{StaticResource notRequiredCheckbox}" Content="{Binding}"/>
         </StackPanel>
       </DataTemplate>
 
@@ -48,7 +64,7 @@
           <TreeView Items="{Binding InnerSettings}" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                     Classes="TemplatedTreeView"
                     SelectedItem="{Binding DataContext.SelectedSetting, Mode=OneWayToSource, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:ConfigTreeView}}}"
-                    SelectionChanged="innerSelectionChanged">
+                    SelectionChanged="InnerSelectionChanged">Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}
             <TreeView.Styles>
               <Style Selector=".TemplatedTreeView > Border">
                 <Setter Property="BorderBrush" Value="Transparent"/>
@@ -56,6 +72,8 @@
             </TreeView.Styles>
           </TreeView>
           <StackPanel Orientation="Horizontal">
+            <ContentPresenter ContentTemplate="{StaticResource notRequiredCheckbox}" Content="{Binding}"/>
+            
             <Button Command="{Binding DeleteItem}">
               <Image Source="/Assets/delete.png"/>
             </Button>
@@ -97,19 +115,26 @@
       <TreeDataTemplate DataType="models:ContainerSetting" ItemsSource="{Binding InnerSettings}">
         <StackPanel>
           <TextBlock Text="{Binding Name}" Foreground="Gray"/>
+
+          <ContentPresenter ContentTemplate="{StaticResource notRequiredCheckbox}" Content="{Binding}"/>
         </StackPanel>
       </TreeDataTemplate>
 
       <TreeDataTemplate DataType="models:CustomSetting" ItemsSource="{Binding InnerSettings}">
         <StackPanel>
-          <TextBox Text="{Binding Name, Mode = TwoWay}" Foreground="MediumSlateBlue"/>
-          <TextBox Text="{Binding Value, Mode = TwoWay}" />
-
+          <TextBox Text="{Binding Name, Mode = TwoWay}" Foreground="MediumSlateBlue" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}" />
+          <TextBox Text="{Binding Value, Mode = TwoWay}" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+          
+          <CheckBox IsChecked="{Binding IsEnabled}" Checked="OnCheckBoxCheck" Unchecked="OnCheckBoxUncheck"/>
+          
           <Button Command="{Binding MoveForward}" Classes="hideInactive">
             <Image Source="/Assets/down.png"/>
           </Button>
           <Button Command="{Binding MoveBack}" Classes="hideInactive">
             <Image Source="/Assets/up.png"/>
+          </Button>
+          <Button Command="{Binding MoveUp}" Classes="hideInactive">
+            <Image Source="/Assets/left.png"/>
           </Button>
           <Button Command="{Binding DeleteItem}" Classes="hideInactive">
             <Image Source="/Assets/delete.png"/>

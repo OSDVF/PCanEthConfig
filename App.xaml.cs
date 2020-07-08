@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Data.Converters;
 using Avalonia.Markup.Xaml;
 using EthCanConfig.ViewModels;
 using EthCanConfig.Views;

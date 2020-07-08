@@ -69,6 +69,15 @@ namespace EthCanConfig.ViewModels
                                     new EnumSetting("bitOrder",BitOrder.MSB),
                                     new NumberArraySetting("shuffle"){IsRequired=false,IsEnabled = false},
                                 }),
+                            }),
+                            new MultipleAdditiveContainerSetting("actions",new Collection<SettingsTemplate>()
+                            {
+                                new SettingsTemplate("not",new ChildObservableCollection<IConfigurationSetting>()
+                                {
+                                    new HardCodedSetting("action","not"),
+                                    new StringSetting("inputName",string.Empty){ IsRequired = false},
+                                    new UnsignedNumberSetting("inputIndex",0){ IsRequired = false}
+                                })
                             })
                         })
                     })){IsRequired=false}
@@ -105,7 +114,11 @@ namespace EthCanConfig.ViewModels
             else
             {
                 var parent = SelectedSetting.Parent;
-                if (parent is IContainerSetting)
+                if(SelectedSetting is CustomSetting)
+                {
+                    (SelectedSetting as IContainerSetting).InnerSettings.Add(newCustomSetting);
+                }
+                else if (parent is IContainerSetting)
                 {
                     (parent as IContainerSetting).InnerSettings.Add(newCustomSetting);
                 }

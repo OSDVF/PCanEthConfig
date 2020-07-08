@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using ReactiveUI;
 
 namespace EthCanConfig.Models
 {
-    public class UniversalSetting : IConfigurationSetting, IContainerSetting
+    public class UniversalSetting : ReactiveObject, IConfigurationSetting, IContainerSetting
     {
         public string Name { get; set; }
         public virtual dynamic Value { get; set; }
@@ -34,18 +36,25 @@ namespace EthCanConfig.Models
             return clone;
         }
         private bool _isRequired = true;
+        private bool _isEnabled = true;
+
         public bool IsRequired
         {
             get => _isRequired; set
             {
-                if(value)
+                if (value)
                 {
                     IsEnabled = true;
                 }
                 _isRequired = value;
             }
         }
-        public bool IsEnabled { get; set; } = true;
+        public bool IsEnabled { get => _isEnabled; set
+            {
+                _isEnabled = value;
+                this.RaiseAndSetIfChanged(ref _isEnabled, value);
+            }
+        }
     }
 
     public class HardCodedSetting : UniversalSetting
