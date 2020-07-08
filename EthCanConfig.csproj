@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
     <!-- dependencies coming from the package manager lock file should not be copied locally for .NET Core and .NETStandard projects -->
     <CopyLocalLockFileAssemblies Condition="'$(CopyLocalLockFileAssemblies)' == ''">false</CopyLocalLockFileAssemblies>
     <Authors>O.S.DV.F</Authors>

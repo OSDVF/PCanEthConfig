@@ -10,7 +10,7 @@ namespace EthCanConfig.Views
         {
             InitializeComponent();
 #if DEBUG
-            this.AttachDevTools();
+            this.AttachDevTools(new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F12,Avalonia.Input.KeyModifiers.Control));
 #endif
         }
 
@@ -19,4 +19,5 @@ namespace EthCanConfig.Views
             AvaloniaXamlLoader.Load(this);
         }
     }
+
 }

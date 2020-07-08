@@ -3,6 +3,7 @@
         xmlns:vm="clr-namespace:EthCanConfig.ViewModels;assembly=EthCanConfig"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:EthCanConfig.Models;assembly=EthCanConfig"
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
         x:Class="EthCanConfig.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
@@ -25,19 +26,100 @@
       <Button Content="Show Info" />
       <Button Content="Upload" />
     </StackPanel>
+    <WrapPanel x:Name="StatusStrip" DockPanel.Dock="Bottom">
+      <TextBlock Text="Settings data types:" Margin="5,0,15,0" />
+      <Panel Background="Crimson"/>
+      <TextBlock Text="String" />
+      <Panel Background="DodgerBlue"/>
+      <TextBlock Text="Number" />
+      <Panel Background="Green"/>
+      <TextBlock Text="UnsignedNumber" />
+      <Panel Background="Brown"/>
+      <TextBlock Text="Enum" />
+      <Panel Background="Gray"/>
+      <TextBlock Text="Container" />
+      <Panel Background="MediumSlateBlue"/>
+      <TextBlock Text="Custom" />
+      <Panel Background="Black"/>
+      <TextBlock Text="Unknown" />
+    </WrapPanel>
+
+
     <Grid Margin="0,10,0,0">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
         <ColumnDefinition Width="5" />
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
-      <StackPanel Orientation="Vertical" Grid.Column="0">
-        <TextBlock FontWeight="Bold" Text="Visual Editor" Margin="7"/>
-        <TreeView Items="{Binding Settings}"/>
-      </StackPanel>
+      <Grid Grid.Column="0">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock FontWeight="Bold" Text="Visual Editor" Margin="7" Grid.Row="0"/>
+        <TreeView Items="{Binding Settings}" Grid.Row="1" SelectedItem="{Binding SelectedSetting, Mode=TwoWay}">
+          <TreeView.DataTemplates>
+
+            <DataTemplate DataType="models:EnumSetting">
+              <StackPanel Classes="inner">
+                <TextBlock Text="{Binding Name}" Foreground="Brown"/>
+                <DropDown Items="{Binding Values}" BorderBrush="AliceBlue" SelectedItem="{Binding TypedValue, Mode=TwoWay}"/>
+              </StackPanel>
+            </DataTemplate>
+            
+            <DataTemplate DataType="models:StringSetting">
+              <StackPanel>
+                <TextBlock Text="{Binding Name}" Foreground="Crimson"/>
+                <TextBox Text="{Binding StringValue, Mode = TwoWay}" />
+              </StackPanel>
+            </DataTemplate>
+            
+            <TreeDataTemplate DataType="models:ContainerSetting" ItemsSource="{Binding InnerSettings}">
+              <StackPanel>
+                <TextBlock Text="{Binding Name}" Foreground="Gray"/>
+              </StackPanel>
+            </TreeDataTemplate>
+
+            <TreeDataTemplate DataType="models:CustomSetting" ItemsSource="{Binding InnerSettings}">
+              <StackPanel>
+                <TextBox Text="{Binding Name, Mode = TwoWay}" Foreground="MediumSlateBlue"/>
+                <TextBox Text="{Binding Value, Mode = TwoWay}" />
+              </StackPanel>
+            </TreeDataTemplate>
+
+            <TreeDataTemplate DataType="models:UniversalSetting" ItemsSource="{Binding InnerSettings}">
+              <StackPanel>
+                <TextBlock Text="{Binding Name}"/>
+                <TextBox Text="{Binding Value, Mode = TwoWay}" />
+              </StackPanel>
+            </TreeDataTemplate>
+          </TreeView.DataTemplates>
+        </TreeView>
+        <Button Content="+  Custom Setting" Width="120" Grid.Row="2" Command="{Binding AddCustomSetting}"/>
+      </Grid>
       <GridSplitter Grid.Column="1"/>
       <TextBlock Grid.Column="2" Text="Configuration file preview"  Margin="7"></TextBlock>
     </Grid>
   </DockPanel>
-
+  <Window.Styles>
+    <Style Selector="TreeViewItem > StackPanel">
+      <Setter Property="Orientation" Value="Horizontal" />
+    </Style>
+    <Style Selector="TreeViewItem > StackPanel > TextBlock">
+      <Setter Property="Margin" Value="5"/>
+    </Style>
+    
+    <Style Selector="TreeView TextBox">
+      <Setter Property="BorderBrush" Value="AliceBlue"/>
+    </Style>
+    <Style Selector="WrapPanel Panel">
+      <Setter Property="Margin" Value="7" />
+      <Setter Property="Width" Value="5" />
+      <Setter Property="Height" Value="5" />
+    </Style>
+    <Style Selector="WrapPanel TextBlock">
+      <Setter Property="Margin" Value="0,0,15,0" />
+    </Style>
+  </Window.Styles>
 </Window>
