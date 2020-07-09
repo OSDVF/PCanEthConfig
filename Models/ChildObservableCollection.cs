@@ -42,8 +42,15 @@ namespace EthCanConfig.Models
         protected override void InsertItem(int index, T item)
         {
             item.Parent = _parent;
+            item.Changed += Item_Changed;
             base.InsertItem(index, item);
         }
+
+        private void Item_Changed(IObservableSetting sender)
+        {
+            OnInnerItemChanged(new T[] { (T)sender },this);
+        }
+
         protected override void SetItem(int index, T item)
         {
             item.Parent = _parent;

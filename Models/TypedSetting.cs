@@ -6,7 +6,7 @@ using Utf8Json;
 
 namespace EthCanConfig.Models
 {
-    public class TypedSetting<T> : ReactiveObject, IConfigurationSetting
+    public class TypedSetting<T> : IConfigurationSetting
     {
         public virtual string Name { get; set; }
         public object Value
@@ -18,7 +18,14 @@ namespace EthCanConfig.Models
             }
         }
         [IgnoreDataMember]
-        public T TypedValue { get; set; }
+        public T TypedValue
+        {
+            get => typedValue; set
+            {
+                typedValue = value;
+                Changed?.Invoke(this);
+            }
+        }
         [IgnoreDataMember]
         public virtual string StringValue
         {
@@ -44,10 +51,14 @@ namespace EthCanConfig.Models
         }
         [IgnoreDataMember]
         public IContainerSetting Parent { get; set; }
+
+        public new event SettingChangedEventHandler Changed;
         [IgnoreDataMember]
         private bool _isRequired = true;
         [IgnoreDataMember]
         private bool _isEnabled = true;
+        private T typedValue;
+
         [IgnoreDataMember]
         public bool IsRequired
         {
@@ -66,7 +77,7 @@ namespace EthCanConfig.Models
             get => _isEnabled; set
             {
                 _isEnabled = value;
-                this.RaiseAndSetIfChanged(ref _isEnabled, value);
+                Changed?.Invoke(this);
             }
         }
         public TypedSetting(string name, T value)

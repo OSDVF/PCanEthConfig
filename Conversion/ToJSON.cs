@@ -38,6 +38,8 @@ namespace EthCanConfig.Conversion
 
         public virtual void Serialize(ref JsonWriter writer, IConfigurationSetting value, IJsonFormatterResolver formatterResolver)
         {
+            if (!value.IsEnabled)
+                return;
             writer.WritePropertyName(value.Name);
             writer.WriteString(value.Value.ToString());
             WriteSeparatorIfNotTheLast(ref writer, value);
@@ -59,6 +61,8 @@ namespace EthCanConfig.Conversion
 
         public void Serialize(ref JsonWriter writer, TypedSetting<T> value, IJsonFormatterResolver formatterResolver)
         {
+            if (!value.IsEnabled)
+                return;
             writer.WritePropertyName(value.Name);
             writer.WriteString(value.StringValue);
             WriteSeparatorIfNotTheLast(ref writer, value);
@@ -79,10 +83,35 @@ namespace EthCanConfig.Conversion
 
         public void Serialize(ref JsonWriter writer, NumberSetting value, IJsonFormatterResolver formatterResolver)
         {
-            base.Serialize(ref writer, value, formatterResolver);
+            if (!value.IsEnabled)
+                return;
+            writer.WritePropertyName(value.Name);
+            writer.WriteInt32(value.TypedValue);
+            WriteSeparatorIfNotTheLast(ref writer, value);
         }
 
         NumberSetting IJsonFormatter<NumberSetting>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+    public class UnsignedNumberSettingFormatter : TypedFormatter<uint[]>, IJsonFormatter<UnsignedNumberSetting>
+    {
+        public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Serialize(ref JsonWriter writer, UnsignedNumberSetting value, IJsonFormatterResolver formatterResolver)
+        {
+            if (!value.IsEnabled)
+                return;
+            writer.WritePropertyName(value.Name);
+            writer.WriteUInt32(value.TypedValue);
+            WriteSeparatorIfNotTheLast(ref writer, value);
+        }
+
+        UnsignedNumberSetting IJsonFormatter<UnsignedNumberSetting>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
         {
             throw new System.NotImplementedException();
         }
@@ -97,6 +126,8 @@ namespace EthCanConfig.Conversion
 
         public void Serialize(ref JsonWriter writer, SignedNumberArraySetting value, IJsonFormatterResolver formatterResolver)
         {
+            if (!value.IsEnabled)
+                return;
             writer.WritePropertyName(value.Name);
             writer.WriteBeginArray();
             int[] typedValue = value.TypedValue;
@@ -126,6 +157,8 @@ namespace EthCanConfig.Conversion
 
         public void Serialize(ref JsonWriter writer, UnsignedNumberArraySetting value, IJsonFormatterResolver formatterResolver)
         {
+            if (!value.IsEnabled)
+                return;
             writer.WritePropertyName(value.Name);
             writer.WriteBeginArray();
             uint[] typedValue = value.TypedValue;
@@ -146,24 +179,6 @@ namespace EthCanConfig.Conversion
         }
     }
 
-    public class UnsignedNumberSettingFormatter : TypedFormatter<uint[]>, IJsonFormatter<UnsignedNumberSetting>
-    {
-        public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void Serialize(ref JsonWriter writer, UnsignedNumberSetting value, IJsonFormatterResolver formatterResolver)
-        {
-            base.Serialize(ref writer, value, formatterResolver);
-        }
-
-        UnsignedNumberSetting IJsonFormatter<UnsignedNumberSetting>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
-        {
-            throw new System.NotImplementedException();
-        }
-    }
-
     class StringSettingFormatter : ConfigurationFormatter, IJsonFormatter<StringSetting>
     {
         public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
@@ -177,6 +192,24 @@ namespace EthCanConfig.Conversion
         }
 
         StringSetting IJsonFormatter<StringSetting>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    class HexSettingFormatter : TypedFormatter<uint>, IJsonFormatter<HexadecimalSetting>
+    {
+        public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Serialize(ref JsonWriter writer, HexadecimalSetting value, IJsonFormatterResolver formatterResolver)
+        {
+            base.Serialize(ref writer, value, formatterResolver);
+        }
+
+        HexadecimalSetting IJsonFormatter<HexadecimalSetting>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
         {
             throw new System.NotImplementedException();
         }
@@ -200,6 +233,28 @@ namespace EthCanConfig.Conversion
         }
     }
 
+    class BoolSettingFormatter : TypedFormatter<bool>, IJsonFormatter<BoolSetting>
+    {
+        public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Serialize(ref JsonWriter writer, BoolSetting value, IJsonFormatterResolver formatterResolver)
+        {
+            if (!value.IsEnabled)
+                return;
+            writer.WritePropertyName(value.Name);
+            writer.WriteBoolean(value.TypedValue);
+            WriteSeparatorIfNotTheLast(ref writer, value);
+        }
+
+        BoolSetting IJsonFormatter<BoolSetting>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
     class ContainerConfigurationFormatter : IJsonFormatter<ContainerSetting>
     {
         public virtual ContainerSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
@@ -209,6 +264,8 @@ namespace EthCanConfig.Conversion
 
         public void Serialize(ref JsonWriter writer, ContainerSetting value, IJsonFormatterResolver formatterResolver)
         {
+            if (!value.IsEnabled)
+                return;
             if (!string.IsNullOrEmpty(value.Name))
                 writer.WritePropertyName(value.Name);
             writer.WriteBeginObject();
@@ -227,8 +284,7 @@ namespace EthCanConfig.Conversion
                     genericFormatter = formatterResolver.GetFormatterWithVerify<StringSetting>();
                 else if (inner is HexadecimalSetting)
                 {
-                    var hexFrmt = formatterResolver.GetFormatterWithVerify<UnsignedNumberSetting>();
-                    hexFrmt.Serialize(ref writer, (UnsignedNumberSetting)inner, formatterResolver);
+                    new TypedFormatter<uint>().Serialize(ref writer, (HexadecimalSetting)inner, formatterResolver);
                     continue;
                 }
                 else if (inner is UnsignedNumberArraySetting)
@@ -241,6 +297,16 @@ namespace EthCanConfig.Conversion
                 {
                     var fmt = formatterResolver.GetFormatterWithVerify<SignedNumberArraySetting>();
                     fmt.Serialize(ref writer, (SignedNumberArraySetting)inner, formatterResolver);
+                    continue;
+                }
+                else if (inner is RegexSetting)
+                {
+                    new StringSettingFormatter().Serialize(ref writer, (RegexSetting)inner, formatterResolver);
+                    continue;
+                }
+                else if (inner is BoolSetting)
+                {
+                    new BoolSettingFormatter().Serialize(ref writer, (BoolSetting)inner, formatterResolver);
                     continue;
                 }
                 else

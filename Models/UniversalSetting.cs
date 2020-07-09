@@ -11,10 +11,24 @@ using EthCanConfig.Conversion;
 namespace EthCanConfig.Models
 {
     [JsonFormatter(typeof(ConfigurationFormatter))]
-    public class UniversalSetting : ReactiveObject, IConfigurationSetting, IContainerSetting
+    public class UniversalSetting : IConfigurationSetting, IContainerSetting
     {
-        public string Name { get; set; }
-        public virtual dynamic Value { get; set; }
+        public string Name
+        {
+            get => name; set
+            {
+                name = value;
+                Changed?.Invoke(this);
+            }
+        }
+        public virtual dynamic Value
+        {
+            get => _value; set
+            {
+                _value = value;
+                Changed?.Invoke(this);
+            }
+        }
         public ChildObservableCollection<IConfigurationSetting> InnerSettings { get; set; } = new ChildObservableCollection<IConfigurationSetting>();
         [IgnoreDataMember]
         public IContainerSetting Parent { get; set; }
@@ -40,10 +54,15 @@ namespace EthCanConfig.Models
             clone.InnerSettings = innerSettings;
             return clone;
         }
+
+        public new event SettingChangedEventHandler Changed;
         [IgnoreDataMember]
         private bool _isRequired = true;
         [IgnoreDataMember]
         private bool _isEnabled = true;
+        private string name;
+        private dynamic _value;
+
         [IgnoreDataMember]
         public bool IsRequired
         {
@@ -57,10 +76,12 @@ namespace EthCanConfig.Models
             }
         }
         [IgnoreDataMember]
-        public bool IsEnabled { get => _isEnabled; set
+        public bool IsEnabled
+        {
+            get => _isEnabled; set
             {
                 _isEnabled = value;
-                this.RaiseAndSetIfChanged(ref _isEnabled, value);
+                Changed?.Invoke(this);
             }
         }
     }
@@ -72,7 +93,7 @@ namespace EthCanConfig.Models
     }
 
     [JsonFormatter(typeof(ConfigurationFormatter))]
-    public interface IConfigurationSetting
+    public interface IConfigurationSetting : IObservableSetting
     {
         string Name { get; set; }
         abstract object Value { get; set; }
@@ -81,4 +102,11 @@ namespace EthCanConfig.Models
         bool IsRequired { get; set; }
         bool IsEnabled { get; set; }
     }
+
+    public interface IObservableSetting
+    {
+        event SettingChangedEventHandler Changed;
+    }
+
+    public delegate void SettingChangedEventHandler(IObservableSetting sender);
 }
