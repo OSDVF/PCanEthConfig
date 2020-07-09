@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DynamicData.Annotations;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -39,6 +40,19 @@ namespace EthCanConfig.Models
             Parent = parent;
         }
 
+        public T this[string name]
+        {
+            get
+            {
+                foreach (var inner in this)
+                {
+                    if (inner.Name == name)
+                        return inner;
+                }
+                return default;
+            }
+        }
+
         protected override void InsertItem(int index, T item)
         {
             item.Parent = _parent;
@@ -48,7 +62,7 @@ namespace EthCanConfig.Models
 
         private void Item_Changed(IObservableSetting sender)
         {
-            OnInnerItemChanged(new T[] { (T)sender },this);
+            OnInnerItemChanged(new T[] { (T)sender }, this);
         }
 
         protected override void SetItem(int index, T item)

@@ -14,7 +14,10 @@ namespace EthCanConfig.Models
             get { return TypedValue; }
             set
             {
-                TypedValue = (T)Convert.ChangeType(value, typeof(T));
+                if (value is string str)
+                    StringValue = str;
+                else
+                    TypedValue = (T)Convert.ChangeType(value, typeof(T));
             }
         }
         [IgnoreDataMember]

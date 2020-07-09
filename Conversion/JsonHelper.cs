@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Utf8Json;
 
 namespace EthCanConfig.Conversion
 {
@@ -119,9 +120,53 @@ namespace EthCanConfig.Conversion
             </html>";
         }
 
-        public static ContainerSetting Deserialize(FileStream strem)
+        public static ContainerSetting Deserialize(FileStream stream)
         {
-            return null;
+            var input = JsonSerializer.Deserialize<dynamic>((Stream)stream);
+            var result = DefaultSettingsObject.defaultSettingsObject.Clone() as ContainerSetting;
+            var rootInner = result.InnerSettings;
+
+            rootInner["logFile"].Value = input["logFile"];
+            rootInner["logLevel"].Value = input["logLevel"];
+            var net = rootInner["net"] as IContainerSetting;
+            var inputNet = input["net"];
+            net.InnerSettings["ip"].Value = inputNet["ip"];
+            net.InnerSettings["mask"].Value = inputNet["mask"];
+            net.InnerSettings["gateway"].Value = inputNet["gateway"];
+
+            var channels = rootInner["channels"] as IContainerSetting;
+            var inputChannels = input["channels"];
+            foreach (var inputChannel in inputChannels)
+                channels.InnerSettings.Add(new SettingsTemplate(new ChildObservableCollection<IConfigurationSetting>()
+                {
+                    new StringSetting("name",inputChannel["name"]),
+                    new UnsignedNumberSetting("bitrate",(uint)inputChannel["bitrate"])
+                }));
+
+            var routes = rootInner["routes"] as IContainerSetting;
+            var inputRoutes = input["routes"];
+            foreach (Dictionary<string, object> inputRoute in inputRoutes)
+            {
+                bool canin = (string)inputRoute["type"] == "canin";
+                routes.InnerSettings.Add(new SettingsTemplate(new ChildObservableCollection<IConfigurationSetting>()
+                {
+                    new StringSetting("name",inputRoute.ContainsKey("name")? (string)inputRoute["name"]:string.Empty),
+                    new EnumSetting("type",canin?RouteType.canin:RouteType.canout),
+                    canin ? CanInListenersDeserialize(inputRoute["listeners"]):CanOutListenersDeserialize(inputRoute["listeners"])
+                }));
+            }
+
+            return result;
+        }
+
+        private static dynamic CanOutListenersDeserialize(dynamic listeners)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static IConfigurationSetting CanInListenersDeserialize(dynamic listeners)
+        {
+            throw new NotImplementedException();
         }
     }
 
