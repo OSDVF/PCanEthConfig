@@ -1,13 +1,15 @@
-﻿using System;
+﻿using EthCanConfig.Conversion;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using Utf8Json;
 
 namespace EthCanConfig.Models
 {
-    class NumberArraySetting<T> : TypedSetting<T[]>
+    public class NumberArraySetting<T> : TypedSetting<T[]>
     {
         [IgnoreDataMember]
         public string FancyName => "[ " + Name + " ]";
@@ -54,8 +56,8 @@ namespace EthCanConfig.Models
         {
         }
     }
-
-    class SignedNumberArraySetting : NumberArraySetting<int>
+    [JsonFormatter(typeof(SignedArraySettingsFormatter))]
+    public class SignedNumberArraySetting : NumberArraySetting<int>
     {
         public SignedNumberArraySetting(string name) : base(name)
         {
@@ -66,7 +68,8 @@ namespace EthCanConfig.Models
         }
     }
 
-    class UnsignedNumberArraySetting : NumberArraySetting<uint>
+    [JsonFormatter(typeof(UnsignedArraySettingsFormatter))]
+    public class UnsignedNumberArraySetting : NumberArraySetting<uint>
     {
         public UnsignedNumberArraySetting(string name) : base(name)
         {

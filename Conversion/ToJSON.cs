@@ -88,7 +88,65 @@ namespace EthCanConfig.Conversion
         }
     }
 
-    public class UnsignedNumberSettingFormatter : TypedFormatter<uint>, IJsonFormatter<UnsignedNumberSetting>
+    public class SignedArraySettingsFormatter : TypedFormatter<int[]>, IJsonFormatter<SignedNumberArraySetting>
+    {
+        public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Serialize(ref JsonWriter writer, SignedNumberArraySetting value, IJsonFormatterResolver formatterResolver)
+        {
+            writer.WritePropertyName(value.Name);
+            writer.WriteBeginArray();
+            int[] typedValue = value.TypedValue;
+            if (typedValue != null)
+                for (int i = 0; i < typedValue.Length;i++)
+                {
+                    writer.WriteInt32(typedValue[i]);
+                    if (i != typedValue.Length - 1)
+                        writer.WriteValueSeparator();
+                }
+            writer.WriteEndArray();
+            WriteSeparatorIfNotTheLast(ref writer, value);
+        }
+
+        SignedNumberArraySetting IJsonFormatter<SignedNumberArraySetting>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class UnsignedArraySettingsFormatter : TypedFormatter<int[]>, IJsonFormatter<UnsignedNumberArraySetting>
+    {
+        public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Serialize(ref JsonWriter writer, UnsignedNumberArraySetting value, IJsonFormatterResolver formatterResolver)
+        {
+            writer.WritePropertyName(value.Name);
+            writer.WriteBeginArray();
+            uint[] typedValue = value.TypedValue;
+            if (typedValue != null)
+                for (int i = 0; i < typedValue.Length; i++)
+                {
+                    writer.WriteUInt32(typedValue[i]);
+                    if (i != typedValue.Length - 1)
+                        writer.WriteValueSeparator();
+                }
+            writer.WriteEndArray();
+            WriteSeparatorIfNotTheLast(ref writer, value);
+        }
+
+        UnsignedNumberArraySetting IJsonFormatter<UnsignedNumberArraySetting>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class UnsignedNumberSettingFormatter : TypedFormatter<uint[]>, IJsonFormatter<UnsignedNumberSetting>
     {
         public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
         {
@@ -154,7 +212,7 @@ namespace EthCanConfig.Conversion
             if (!string.IsNullOrEmpty(value.Name))
                 writer.WritePropertyName(value.Name);
             writer.WriteBeginObject();
-            WriteInnerSettings(ref writer,value,formatterResolver);
+            WriteInnerSettings(ref writer, value, formatterResolver);
             writer.WriteEndObject();
             ConfigurationFormatter.WriteSeparatorIfNotTheLast(ref writer, value);
         }
@@ -167,7 +225,24 @@ namespace EthCanConfig.Conversion
 
                 if (inner is HardCodedSetting)
                     genericFormatter = formatterResolver.GetFormatterWithVerify<StringSetting>();
-
+                else if (inner is HexadecimalSetting)
+                {
+                    var hexFrmt = formatterResolver.GetFormatterWithVerify<UnsignedNumberSetting>();
+                    hexFrmt.Serialize(ref writer, (UnsignedNumberSetting)inner, formatterResolver);
+                    continue;
+                }
+                else if (inner is UnsignedNumberArraySetting)
+                {
+                    var fmt = formatterResolver.GetFormatterWithVerify<UnsignedNumberArraySetting>();
+                    fmt.Serialize(ref writer, (UnsignedNumberArraySetting)inner, formatterResolver);
+                    continue;
+                }
+                else if (inner is SignedNumberArraySetting)
+                {
+                    var fmt = formatterResolver.GetFormatterWithVerify<SignedNumberArraySetting>();
+                    fmt.Serialize(ref writer, (SignedNumberArraySetting)inner, formatterResolver);
+                    continue;
+                }
                 else
                     genericFormatter = formatterResolver.GetFormatterDynamic(inner.GetType());
 

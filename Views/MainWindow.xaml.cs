@@ -1,8 +1,11 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Html;
 using Avalonia.Markup.Xaml;
 using EthCanConfig.Conversion;
 using EthCanConfig.ViewModels;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace EthCanConfig.Views
 {
@@ -28,10 +31,10 @@ namespace EthCanConfig.Views
         private void MainWindow_DataContextChanged(object sender, System.EventArgs e)
         {
             viewModel = DataContext as MainWindowViewModel;
-            viewModel.Settings.CollectionChanged += Settings_CollectionChanged;
+            viewModel.Settings.InnerItemChanged += Settings_InnerItemChanged;
         }
 
-        private void Settings_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void Settings_InnerItemChanged(IEnumerable<Models.IConfigurationSetting> item, Models.ChildObservableCollection<Models.IConfigurationSetting> collection)
         {
             previewTextBox.Text = viewModel.JSONPreview;
         }

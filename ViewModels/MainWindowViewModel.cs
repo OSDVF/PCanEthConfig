@@ -61,7 +61,8 @@ namespace EthCanConfig.ViewModels
 
         public IConfigurationSetting SelectedSetting { get; set; }
 
-        public string JSONPreview => Utf8Json.JsonSerializer.PrettyPrint(ToJSON.Serialize(SettingsObject));
+        public string JSONPreview => JsonHelper.FormatJson(ToJSON.Serialize(SettingsObject));
+        public string JSONHTMLPreview => JsonHelper.ToHTMLPreview(JsonHelper.SyntaxHighlightJson(JSONPreview));
 
         private void AddCustomSetting()
         {
