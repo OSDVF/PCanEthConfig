@@ -36,6 +36,8 @@
       <TextBlock Text="Number" />
       <Panel Background="Green"/>
       <TextBlock Text="UnsignedNumber" />
+      <Panel Background="Goldenrod"/>
+      <TextBlock Text="Boolean" />
       <Panel Background="Brown"/>
       <TextBlock Text="Enum" />
       <Panel Background="Gray"/>

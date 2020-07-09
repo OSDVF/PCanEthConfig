@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml;
@@ -8,16 +9,14 @@ using EthCanConfig.ViewModels;
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
 
 namespace EthCanConfig.Views
 {
     public class ConfigTreeView : UserControl
     {
         TreeView mainTree;
-        public ConfigTreeView()
-        {
-            InitializeComponent();
-        }
+        public ConfigTreeView() => InitializeComponent();
 
         private void InitializeComponent()
         {

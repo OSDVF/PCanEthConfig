@@ -13,7 +13,7 @@
       </DataTemplate>
       <views:EnabledToOpacityConverter x:Key="etoConv"/>
     </TreeView.Resources>
-    <TreeView.DataTemplates>
+      <TreeView.DataTemplates>
       <DataTemplate DataType="models:EnumSetting">
         <StackPanel Classes="inner">
           <TextBlock Text="{Binding Name}" Foreground="Brown" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
@@ -50,6 +50,14 @@
         </StackPanel>
       </DataTemplate>
 
+      <DataTemplate DataType="models:BoolSetting">
+        <StackPanel>
+          <CheckBox IsChecked="{Binding TypedValue, Mode=TwoWay}" Content="{Binding Name}" Foreground="Goldenrod" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+
+          <ContentPresenter ContentTemplate="{StaticResource notRequiredCheckbox}" Content="{Binding}"/>
+        </StackPanel>
+      </DataTemplate>
+
       <DataTemplate DataType="models:UnsignedNumberSetting">
         <StackPanel>
           <TextBlock Text="{Binding Name}" Foreground="Green" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
@@ -79,13 +87,27 @@
 
       <DataTemplate DataType="models:SettingsTemplate">
         <StackPanel Orientation="Vertical">
-          <TreeView Items="{Binding InnerSettings}" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+          <TreeView Items="{Binding InnerSettings}"
                     Classes="TemplatedTreeView"
                     SelectedItem="{Binding DataContext.SelectedSetting, Mode=OneWayToSource, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:ConfigTreeView}}}"
-                    SelectionChanged="InnerSelectionChanged">Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}
+                    SelectionChanged="InnerSelectionChanged"
+                    Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}">
             <TreeView.Styles>
               <Style Selector=".TemplatedTreeView > Border">
                 <Setter Property="BorderBrush" Value="Transparent"/>
+              </Style>
+              <Style Selector="TreeView.TemplatedTreeView">
+                <Setter Property="Template">
+                  <ControlTemplate>
+                    <Border BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <ItemsPresenter Name="PART_ItemsPresenter"
+                                        Items="{TemplateBinding Items}"
+                                        ItemsPanel="{TemplateBinding ItemsPanel}"
+                                        Margin="{TemplateBinding Padding}"/>
+                    </Border>
+                  </ControlTemplate>
+                </Setter>
               </Style>
             </TreeView.Styles>
           </TreeView>
