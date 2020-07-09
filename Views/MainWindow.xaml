@@ -9,25 +9,44 @@
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
         x:Class="EthCanConfig.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="EthCanConfig">
+        Title="EthCanConfig"
+        KeyDown="KeyDown">
 
   <Design.DataContext>
     <vm:MainWindowViewModel/>
   </Design.DataContext>
   <DockPanel>
-    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-      <Menu Height="20">
-        <MenuItem Header="File">
-          <MenuItem Header="Open" Icon=""/>
-          <MenuItem Header="Close"/>
-          <MenuItem Header="Save" Icon=""/>
-        </MenuItem>
-        <MenuItem Header="Device " FontWeight="Bold" />
+    <Grid DockPanel.Dock="Top">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <Grid.Resources>
+        <views:BooleanToDirtyTextConverter x:Key="btdc"/>
+      </Grid.Resources>
+      <StackPanel Orientation="Horizontal" Grid.Column="0">
+        <Menu Height="20">
+          <MenuItem Header="File">
+            <MenuItem Header="New" Command="{Binding NewFile}" Click="NewFile"/>
+            <MenuItem Header="Open" Icon="" Click="OpenFile"/>
+            <MenuItem Header="Save" Icon="" Click="Save"/>
+            <MenuItem Header="Save As" Icon="" Click="SaveAs"/>
+          </MenuItem>
+        </Menu>
+        <TextBlock Text="Device:" FontWeight="Bold"/>
         <TextBlock Text="{Binding ConnectedDeviceIP}" />
-      </Menu>
-      <Button Content="Show Info" />
-      <Button Content="Upload" />
-    </StackPanel>
+        <Button Content="Connect" Command="{Binding DeviceInfo.Connect}"/>
+        <Button Content="Show Info" Command="{Binding DeviceInfo.ShowInfo}"/>
+        <Button Content="Upload" Command="{Binding DeviceInfo.UploadSettings}" CommandParameter="{Binding SavedFileName}"/>
+      </StackPanel>
+      <TextBlock Text="{Binding SettingsDirty, Converter={StaticResource btdc}}" FontFamily="Segoe UI Emoji" HorizontalAlignment="Right"  Grid.Column="1" Margin="5"/>
+      <Grid.Styles>
+        <Style Selector="TextBlock, Button">
+          <Setter Property="VerticalAlignment" Value="Center"/>
+          <Setter Property="Margin" Value="5,0,5,0" />
+        </Style>
+      </Grid.Styles>
+    </Grid>
     <WrapPanel x:Name="StatusStrip" DockPanel.Dock="Bottom">
       <TextBlock Text="Settings data types:" Margin="5,0,15,0" />
       <Panel Background="Crimson"/>

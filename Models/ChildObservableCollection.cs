@@ -58,7 +58,7 @@ namespace EthCanConfig.Models
         }
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            OnInnerItemChanged((e.NewItems ?? e.OldItems).Cast<T>(), this);
+            OnInnerItemChanged((e.NewItems ?? e.OldItems)?.Cast<T>(), this);
             base.OnCollectionChanged(e);
         }
 

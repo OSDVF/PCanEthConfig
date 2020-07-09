@@ -1,5 +1,7 @@
-﻿using System;
+﻿using EthCanConfig.Models;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -115,6 +117,11 @@ namespace EthCanConfig.Conversion
             @"
                 </body>
             </html>";
+        }
+
+        public static ContainerSetting Deserialize(FileStream strem)
+        {
+            return null;
         }
     }
 
