@@ -29,9 +29,12 @@ namespace EthCanConfig.Models
                     new StringSetting("name", string.Empty) { IsRequired = false, IsEnabled = false},
                     new HardCodedSetting("type", RouteType.canout),
                     new AdditiveContainerSetting("listeners",new SettingsTemplate(new ChildObservableCollection<IConfigurationSetting>(){
-                        new StringSetting("channel","can0"),
-                        new HexadecimalSetting("filter",0x1FFFFFFF,8) { IsEnabled = false,IsRequired = false},
-                        new HexadecimalSetting("filterMask",0x1FFFFFFF,8) { IsEnabled = false,IsRequired = false},
+                        new UnsignedNumberSetting("port",1234),
+                        new EnumSetting("protocol", Protocol.udp),
+                        new RegexSetting("startsWith","$PMACO") { IsEnabled = false,IsRequired = false},
+                        new RegexSetting("endsWith","/\\*[0-9a-fA-F]+/") { IsEnabled = false,IsRequired = false},
+                        new BoolSetting("includeBorders",false),
+                        new RegexSetting("filter","/.*/") { IsEnabled = false,IsRequired = false},
                         new ContainerSetting("converters", Converters.converters)
                     })){IsRequired=false}
                 }),
@@ -40,12 +43,9 @@ namespace EthCanConfig.Models
                     new StringSetting("name", string.Empty) { IsRequired = false, IsEnabled = false},
                     new HardCodedSetting("type", RouteType.canin),
                     new AdditiveContainerSetting("listeners",new SettingsTemplate(new ChildObservableCollection<IConfigurationSetting>(){
-                        new UnsignedNumberSetting("port",1234),
-                        new EnumSetting("protocol", Protocol.udp),
-                        new RegexSetting("startsWith","$PMACO") { IsEnabled = false,IsRequired = false},
-                        new RegexSetting("endsWith","/\\*[0-9a-fA-F]+/") { IsEnabled = false,IsRequired = false},
-                        new BoolSetting("includeBorders",false),
-                        new RegexSetting("filter","/.*/") { IsEnabled = false,IsRequired = false},
+                        new StringSetting("channel","can0"),
+                        new HexadecimalSetting("filter",0x1FFFFFFF,8) { IsEnabled = false,IsRequired = false},
+                        new HexadecimalSetting("filterMask",0x1FFFFFFF,8) { IsEnabled = false,IsRequired = false},
                         new ContainerSetting("converters", Converters.converters)
                     })){IsRequired=false}
                 })

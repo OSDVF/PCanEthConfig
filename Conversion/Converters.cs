@@ -55,7 +55,7 @@ namespace EthCanConfig.Conversion
                     new HardCodedSetting("action","mask"),
                     new StringSetting("inputName", string.Empty) { IsRequired = false},
                     new UnsignedNumberSetting("inputIndex",0) { IsRequired = false},
-                    new StringSetting("mask","FF"),
+                    new RegexSetting("mask","FF"),
                     new EnumSetting("op", MaskOperations.OR)
                 }),
                 new SettingsTemplate("lshift",new ChildObservableCollection<IConfigurationSetting>()

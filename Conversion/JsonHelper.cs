@@ -161,7 +161,7 @@ namespace EthCanConfig.Conversion
             return result;
         }
 
-        private static IConfigurationSetting CanOutListenersDeserialize(dynamic listeners, SettingsTemplate listenerTemplate)
+        private static IConfigurationSetting CanInListenersDeserialize(dynamic listeners, SettingsTemplate listenerTemplate)
         {
             ChildObservableCollection<IConfigurationSetting> outListeners = new ChildObservableCollection<IConfigurationSetting>();
             foreach (var listener in listeners)
@@ -174,68 +174,89 @@ namespace EthCanConfig.Conversion
                     new HexadecimalSetting("filterMask",GetValOrNull<string>(listener,"filterMask"),8) { IsEnabled = ContainsKey(listener,"filterMask"),IsRequired = false},
                     outputConverters
                 }));
-
-                var converterIndex = 0;
-                foreach (Dictionary<string, object> inputConverter in listener["converters"]["input"])
-                {
-                    var outputInputConvs = outputConverters.InnerSettings["input"] as MultipleAdditiveContainerSetting;
-                    if (ContainsKey(inputConverter, "scanf"))
-                    {
-                        outputInputConvs.AddSetting(1);
-                    }
-                    else if (inputConverter.ContainsKey("separator"))
-                    {
-                        outputInputConvs.AddSetting(2);
-                    }
-                    else if (inputConverter.ContainsKey("regex"))
-                    {
-                        outputInputConvs.AddSetting(3);
-                    }
-                    else if (inputConverter.ContainsKey("bits"))
-                    {
-                        outputInputConvs.AddSetting(4);
-                    }
-                    else outputInputConvs.AddSetting(0);//Plain parser
-
-                    AddInnerSettingsByTemplateIndex(converterIndex, inputConverter, ref outputInputConvs);
-                    converterIndex++;
-                }
-
-                converterIndex = 0;
-                foreach (Dictionary<string, object> actionConverter in listener["converters"]["actions"])
-                {
-                    var outputActionConvs = outputConverters.InnerSettings["actions"] as MultipleAdditiveContainerSetting;
-                    string[] actionTemplates = { "not", "mask", "lshift", "rshift", "concat", "shuffle", "swap", "printf", "sed", "regex", "nmeacc" };
-                    outputActionConvs.AddSetting(actionTemplates.IndexOf(actionConverter["action"]));
-                    AddInnerSettingsByTemplateIndex(converterIndex, actionConverter, ref outputActionConvs);
-                    converterIndex++;
-                }
-
-                converterIndex = 0;
-                foreach (Dictionary<string, object> outputConverter in listener["converters"]["output"])
-                {
-                    var outputActionConvs = outputConverters.InnerSettings["output"] as MultipleAdditiveContainerSetting;
-                    string[] outputTemplates = { "printf" };
-                    outputActionConvs.AddSetting(outputTemplates.IndexOf(outputConverter["output"]));
-                    AddInnerSettingsByTemplateIndex(converterIndex, outputConverter, ref outputActionConvs);
-                    converterIndex++;
-                }
+                DeserializeConverters(listener, outputConverters);
 
             }
-            return new AdditiveContainerSetting("listeners", listenerTemplate) { InnerSettings = outListeners };
+            return new AdditiveContainerSetting("listeners", listenerTemplate) { InnerSettings = outListeners, IsRequired = false};
+        }
 
-            static void AddInnerSettingsByTemplateIndex(int instantiatedTemplateIndex, Dictionary<string, object> converter, ref MultipleAdditiveContainerSetting setting)
+        private static void AddInnerSettingsByTemplateIndex(int instantiatedTemplateIndex, Dictionary<string, object> converter, ref MultipleAdditiveContainerSetting setting)
+        {
+            foreach (var settingKey in converter.Keys)
             {
-                foreach (var settingKey in converter.Keys)
-                {
-                    ((IContainerSetting)setting.InnerSettings[instantiatedTemplateIndex]).InnerSettings[settingKey].Value = converter[settingKey];
-                }
+                ((IContainerSetting)setting.InnerSettings[instantiatedTemplateIndex]).InnerSettings[settingKey].Value = converter[settingKey];
             }
         }
 
-        private static IConfigurationSetting CanInListenersDeserialize(dynamic listeners, SettingsTemplate listenerTemplate)
+        private static void DeserializeConverters(dynamic listener, IContainerSetting outputConverters)
         {
-            return new AdditiveContainerSetting("listeners", listenerTemplate);
+            var converterIndex = 0;
+            foreach (Dictionary<string, object> inputConverter in listener["converters"]["input"])
+            {
+                var outputInputConvs = outputConverters.InnerSettings["input"] as MultipleAdditiveContainerSetting;
+                if (ContainsKey(inputConverter, "scanf"))
+                {
+                    outputInputConvs.AddSetting(1);
+                }
+                else if (inputConverter.ContainsKey("separator"))
+                {
+                    outputInputConvs.AddSetting(2);
+                }
+                else if (inputConverter.ContainsKey("regex"))
+                {
+                    outputInputConvs.AddSetting(3);
+                }
+                else if (inputConverter.ContainsKey("bits"))
+                {
+                    outputInputConvs.AddSetting(4);
+                }
+                else outputInputConvs.AddSetting(0);//Plain parser
+
+                AddInnerSettingsByTemplateIndex(converterIndex, inputConverter, ref outputInputConvs);
+                converterIndex++;
+            }
+
+            converterIndex = 0;
+            foreach (Dictionary<string, object> actionConverter in listener["converters"]["actions"])
+            {
+                var outputActionConvs = outputConverters.InnerSettings["actions"] as MultipleAdditiveContainerSetting;
+                string[] actionTemplates = { "not", "mask", "lshift", "rshift", "concat", "shuffle", "swap", "printf", "sed", "regex", "nmeacc" };
+                outputActionConvs.AddSetting(actionTemplates.IndexOf(actionConverter["action"]));
+                AddInnerSettingsByTemplateIndex(converterIndex, actionConverter, ref outputActionConvs);
+                converterIndex++;
+            }
+
+            converterIndex = 0;
+            foreach (Dictionary<string, object> outputConverter in listener["converters"]["output"])
+            {
+                var outputActionConvs = outputConverters.InnerSettings["output"] as MultipleAdditiveContainerSetting;
+                string[] outputTemplates = { "printf" };
+                outputActionConvs.AddSetting(outputTemplates.IndexOf(outputConverter["output"]));
+                AddInnerSettingsByTemplateIndex(converterIndex, outputConverter, ref outputActionConvs);
+                converterIndex++;
+            }
+        }
+
+        private static IConfigurationSetting CanOutListenersDeserialize(dynamic listeners, SettingsTemplate listenerTemplate)
+        {
+            ChildObservableCollection<IConfigurationSetting> outListeners = new ChildObservableCollection<IConfigurationSetting>();
+            foreach (var listener in listeners)
+            {
+                var outputConverters = new ContainerSetting("converters", Converters.converters).Clone() as IContainerSetting;
+                outListeners.Add(new SettingsTemplate(new ChildObservableCollection<IConfigurationSetting>()
+                {
+                    new UnsignedNumberSetting("port",(uint)listener["port"]),
+                    new EnumSetting("protocol", listener["protocol"] == "udp"?Protocol.udp:Protocol.tcp),
+                    new RegexSetting("startsWith",GetValOrNull<string>(listener,"startsWith")) { IsEnabled = ContainsKey(listener,"startsWith"),IsRequired = false},
+                    new RegexSetting("endsWith",GetValOrNull<string>(listener,"endsWith")) { IsEnabled = ContainsKey(listener,"endsWith"),IsRequired = false},
+                    new BoolSetting("includeBorders",listener["includeBorders"]),
+                    new RegexSetting("filter",GetValOrNull<string>(listener,"filter")) { IsEnabled = ContainsKey(listener,"filter"),IsRequired = false},
+                    outputConverters
+                }));
+                DeserializeConverters(listener, outputConverters);
+
+            }
+            return new AdditiveContainerSetting("listeners", listenerTemplate) { IsRequired = false, InnerSettings = outListeners };
         }
 
         public static T GetValOrNull<T>(dynamic obj, string key)
