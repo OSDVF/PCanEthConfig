@@ -18,27 +18,38 @@ namespace EthCanConfig.ViewModels
         public string Greeting => "Welcome to Avalonia!";
         public IPAddress ConnectedDevice;
         public string ConnectedDeviceIP => ConnectedDevice == null ? "Unavaliable" : ConnectedDevice.ToString();
-        public ContainerSetting SettingsObject { get => settingsObject; set => this.RaiseAndSetIfChanged(ref settingsObject, value); }
+        public ContainerSetting SettingsObject
+        {
+            get => settingsObject; set
+            {
+                settingsObject.InnerSettings.InvokeCollectionChanged();
+                settingsObject.InnerSettings = value.InnerSettings;
+                this.RaisePropertyChanged("SettingsObject");
+                this.RaisePropertyChanged("Settings");
+                this.RaisePropertyChanged("JSONPreview");
+            }
+        }
         private bool settingsDirty = true;
         private string savedFileName;
 
-        private ContainerSetting settingsObject = DefaultSettingsObject.defaultSettingsObject;
+        private ContainerSetting settingsObject = DefaultSettingsObject.GetDefaultSettingsObject;
 
         public bool SettingsDirty { get => settingsDirty; set => this.RaiseAndSetIfChanged(ref settingsDirty, value); }
         public string SavedFileName { get => savedFileName; set => this.RaiseAndSetIfChanged(ref savedFileName, value); }
-        public ChildObservableCollection<IConfigurationSetting> Settings => SettingsObject.InnerSettings;
 
         public IConfigurationSetting SelectedSetting { get; set; }
 
         public string JSONPreview => JsonHelper.FormatJson(ToJSON.Serialize(SettingsObject));
         public string JSONHTMLPreview => JsonHelper.ToHTMLPreview(JsonHelper.SyntaxHighlightJson(JSONPreview));
 
+        public ChildObservableCollection<IConfigurationSetting> Settings =>SettingsObject.InnerSettings;
+
         private void AddCustomSetting()
         {
             var newCustomSetting = new CustomSetting();
             if (SelectedSetting == null)
             {//Add top level setting
-                Settings.Add(newCustomSetting);
+                SettingsObject.InnerSettings.Add(newCustomSetting);
             }
             else
             {
@@ -59,6 +70,13 @@ namespace EthCanConfig.ViewModels
                     }
                 }
             }
+        }
+
+        private void NewFile()
+        {
+            SettingsObject = DefaultSettingsObject.GetDefaultSettingsObject;
+            SettingsDirty = false;
+            SavedFileName = null;
         }
     }
 }

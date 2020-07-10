@@ -1,5 +1,6 @@
 ﻿using EthCanConfig.Conversion;
 using System;
+using System.ComponentModel;
 using System.Text;
 using Utf8Json;
 
@@ -8,7 +9,14 @@ namespace EthCanConfig.Models
     [JsonFormatter(typeof(ContainerConfigurationFormatter))]
     public class ContainerSetting : UniversalSetting
     {
-        public override object Value { get => InnerSettings; set => InnerSettings = value as ChildObservableCollection<IConfigurationSetting>; }
+        public override object Value
+        {
+            get => InnerSettings; set
+            {
+                InnerSettings = value as ChildObservableCollection<IConfigurationSetting>;
+                OnChanged();
+            }
+        }
 
         /// <summary>
         /// 

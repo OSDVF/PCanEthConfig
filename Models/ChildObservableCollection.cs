@@ -68,6 +68,7 @@ namespace EthCanConfig.Models
         protected override void SetItem(int index, T item)
         {
             item.Parent = _parent;
+            item.Changed += Item_Changed;
             base.SetItem(index, item);
         }
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
@@ -81,6 +82,11 @@ namespace EthCanConfig.Models
             InnerItemChanged?.Invoke(items, collection);
             var outer = Parent?.Parent?.InnerSettings;
             outer?.OnInnerItemChanged(items as IEnumerable<IConfigurationSetting>, collection as ChildObservableCollection<IConfigurationSetting>);
+        }
+
+        public void InvokeCollectionChanged()
+        {
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
     }
 }

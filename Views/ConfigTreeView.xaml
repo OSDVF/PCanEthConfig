@@ -6,7 +6,7 @@
              xmlns:models="clr-namespace:EthCanConfig.Models;assembly=EthCanConfig"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="EthCanConfig.Views.ConfigTreeView">
-  <TreeView Items="{Binding Settings}" SelectedItem="{Binding SelectedSetting, Mode=OneWayToSource}" x:Name="mainTreeView">
+  <TreeView Items="{Binding Settings}" DataContext="{Binding}" SelectedItem="{Binding SelectedSetting, Mode=OneWayToSource}" x:Name="mainTreeView">
     <TreeView.Resources>
       <DataTemplate x:Key="notRequiredCheckbox">
         <CheckBox IsChecked="{Binding IsEnabled, Mode=TwoWay}" IsVisible="{Binding !IsRequired}" Checked="OnCheckBoxCheck" Unchecked="OnCheckBoxUncheck" />

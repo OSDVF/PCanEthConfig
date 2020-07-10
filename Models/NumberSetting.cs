@@ -29,15 +29,21 @@ namespace EthCanConfig.Models
         /// <param name="name"></param>
         /// <param name="value"></param>
         /// <param name="length">Count of hexadecimal numbers displayed</param>
-        public HexadecimalSetting(string name, uint value, int length) : base(name, value) {
+        public HexadecimalSetting(string name, uint value, int length) : base(name, value)
+        {
             Length = length;
         }
-        [HexValidation,IgnoreDataMember]
+        public HexadecimalSetting(string name, string value, int length = 0) : base(name, 0)
+        {
+            Length = length != 0 ? length : value.Length;
+            StringValue = value;
+        }
+        [HexValidation, IgnoreDataMember]
         public override string StringValue
         {
             get
             {
-                return string.Format("{0:X"+Length.ToString()+"}", TypedValue);
+                return string.Format("{0:X" + Length.ToString() + "}", TypedValue);
             }
             set
             {

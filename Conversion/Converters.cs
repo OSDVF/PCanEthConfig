@@ -9,7 +9,7 @@ namespace EthCanConfig.Conversion
     static class Converters
     {
         public static ChildObservableCollection<IConfigurationSetting> converters = new ChildObservableCollection<IConfigurationSetting>(){
-            new MultipleAdditiveContainerSetting("input",new Collection<SettingsTemplate>()
+            new MultipleAdditiveContainerSetting("input",new List<SettingsTemplate>()
             {
                 new SettingsTemplate("Plain",new ChildObservableCollection<IConfigurationSetting>()
                 {
@@ -42,7 +42,7 @@ namespace EthCanConfig.Conversion
                     new UnsignedNumberArraySetting("shuffle") { IsRequired = false,IsEnabled = false},
                 }),
             }),
-            new MultipleAdditiveContainerSetting("actions",new Collection<SettingsTemplate>()
+            new MultipleAdditiveContainerSetting("actions",new List<SettingsTemplate>()
             {
                 new SettingsTemplate("not",new ChildObservableCollection<IConfigurationSetting>()
                 {
@@ -127,7 +127,7 @@ namespace EthCanConfig.Conversion
                     new UnsignedNumberSetting("destinationIndex",0) { IsRequired = false},
                 }),
             }),
-            new MultipleAdditiveContainerSetting("output",new Collection<SettingsTemplate>()
+            new MultipleAdditiveContainerSetting("output",new List<SettingsTemplate>()
             {
                 new SettingsTemplate("printf",new ChildObservableCollection<IConfigurationSetting>()
                 {

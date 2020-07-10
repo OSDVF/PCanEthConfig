@@ -9,7 +9,9 @@ namespace EthCanConfig.Models
     static class DefaultSettingsObject
     {
         private static int canChannelsCount = 0;
-        public static readonly ContainerSetting defaultSettingsObject = new ContainerSetting(null, new ChildObservableCollection<IConfigurationSetting>() {
+        public static ContainerSetting GetDefaultSettingsObject
+        {
+            get => new ContainerSetting(null, new ChildObservableCollection<IConfigurationSetting>() {
             new StringSetting("logFile","ethCanRouter.log"),
             new EnumSetting("logLevel", LogLevel.normal),
             new ContainerSetting("net",new ChildObservableCollection<IConfigurationSetting>(new IConfigurationSetting[]{
@@ -21,11 +23,11 @@ namespace EthCanConfig.Models
                 new StringSetting("name","can"+(canChannelsCount++).ToString()),
                 new UnsignedNumberSetting("bitrate",250000)
             })),
-            new MultipleAdditiveContainerSetting("routes",new Collection<SettingsTemplate>(){
+            new MultipleAdditiveContainerSetting("routes",new List<SettingsTemplate>(){
                 new SettingsTemplate("Ethernet->CAN",new ChildObservableCollection<IConfigurationSetting>()
                 {
                     new StringSetting("name", string.Empty) { IsRequired = false, IsEnabled = false},
-                    new HardCodedSetting("type", RouteType.canin),
+                    new HardCodedSetting("type", RouteType.canout),
                     new AdditiveContainerSetting("listeners",new SettingsTemplate(new ChildObservableCollection<IConfigurationSetting>(){
                         new StringSetting("channel","can0"),
                         new HexadecimalSetting("filter",0x1FFFFFFF,8) { IsEnabled = false,IsRequired = false},
@@ -36,7 +38,7 @@ namespace EthCanConfig.Models
                 new SettingsTemplate("CAN->Ethernet",new ChildObservableCollection<IConfigurationSetting>()
                 {
                     new StringSetting("name", string.Empty) { IsRequired = false, IsEnabled = false},
-                    new HardCodedSetting("type", RouteType.canout),
+                    new HardCodedSetting("type", RouteType.canin),
                     new AdditiveContainerSetting("listeners",new SettingsTemplate(new ChildObservableCollection<IConfigurationSetting>(){
                         new UnsignedNumberSetting("port",1234),
                         new EnumSetting("protocol", Protocol.udp),
@@ -49,5 +51,6 @@ namespace EthCanConfig.Models
                 })
             })
         });
+        }
     }
 }

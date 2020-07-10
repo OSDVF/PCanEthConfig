@@ -26,7 +26,7 @@ namespace EthCanConfig.Models
             get => typedValue; set
             {
                 typedValue = value;
-                Changed?.Invoke(this);
+                OnChanged();
             }
         }
         [IgnoreDataMember]
@@ -38,7 +38,11 @@ namespace EthCanConfig.Models
             }
             set
             {
-                if (typeof(T).IsEnum)
+                if (typeof(T) == typeof(string))
+                {
+                    TypedValue = (T)Convert.ChangeType(value,typeof(T));
+                }
+                else if (typeof(T).IsEnum)
                 {
                     TypedValue = StringToEnum<T>(value, default);
                 }
@@ -55,7 +59,8 @@ namespace EthCanConfig.Models
         [IgnoreDataMember]
         public IContainerSetting Parent { get; set; }
 
-        public new event SettingChangedEventHandler Changed;
+        public event SettingChangedEventHandler Changed;
+        protected virtual void OnChanged() => Changed?.Invoke(this);
         [IgnoreDataMember]
         private bool _isRequired = true;
         [IgnoreDataMember]

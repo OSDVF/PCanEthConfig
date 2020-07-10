@@ -11,25 +11,36 @@ using EthCanConfig.Conversion;
 namespace EthCanConfig.Models
 {
     [JsonFormatter(typeof(ConfigurationFormatter))]
-    public class UniversalSetting : IConfigurationSetting, IContainerSetting
+    public class UniversalSetting : IConfigurationSetting, IContainerSetting, INotifyPropertyChanged
     {
         public string Name
         {
             get => name; set
             {
                 name = value;
-                Changed?.Invoke(this);
+                OnChanged();
             }
         }
+
+        protected virtual void OnChanged() => Changed?.Invoke(this);
+
         public virtual dynamic Value
         {
             get => _value; set
             {
                 _value = value;
-                Changed?.Invoke(this);
+                OnChanged();
             }
         }
-        public ChildObservableCollection<IConfigurationSetting> InnerSettings { get; set; } = new ChildObservableCollection<IConfigurationSetting>();
+        public ChildObservableCollection<IConfigurationSetting> InnerSettings
+        {
+            get => innerSettings; set
+            {
+                innerSettings = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("InnerSettings"));
+                innerSettings.InvokeCollectionChanged();
+            }
+        }
         [IgnoreDataMember]
         public IContainerSetting Parent { get; set; }
         public UniversalSetting(string name, dynamic value)
@@ -55,13 +66,16 @@ namespace EthCanConfig.Models
             return clone;
         }
 
-        public new event SettingChangedEventHandler Changed;
+        public event SettingChangedEventHandler Changed;
+        public event PropertyChangedEventHandler PropertyChanged;
+
         [IgnoreDataMember]
         private bool _isRequired = true;
         [IgnoreDataMember]
         private bool _isEnabled = true;
         private string name;
         private dynamic _value;
+        private ChildObservableCollection<IConfigurationSetting> innerSettings = new ChildObservableCollection<IConfigurationSetting>();
 
         [IgnoreDataMember]
         public bool IsRequired
@@ -81,7 +95,7 @@ namespace EthCanConfig.Models
             get => _isEnabled; set
             {
                 _isEnabled = value;
-                Changed?.Invoke(this);
+                OnChanged();
             }
         }
     }

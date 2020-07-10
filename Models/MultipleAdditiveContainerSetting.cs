@@ -13,14 +13,14 @@ namespace EthCanConfig.Models
     class MultipleAdditiveContainerSetting : ContainerSetting
     {
         [IgnoreDataMember]
-        public ICollection<SettingsTemplate> ItemTemplates;
+        public List<SettingsTemplate> ItemTemplates;
         [IgnoreDataMember]
         public ICollection<string> ItemTemplateNames
         {
             get
             {
                 List<string> stringNames = new List<string>();
-                foreach(var item in ItemTemplates)
+                foreach (var item in ItemTemplates)
                 {
                     stringNames.Add(item.Name);
                 }
@@ -50,7 +50,7 @@ namespace EthCanConfig.Models
         public MultipleAdditiveContainerSetting(string name, ChildObservableCollection<IConfigurationSetting> innerSettings) : base(name, innerSettings)
         {
         }
-        public MultipleAdditiveContainerSetting(string name, ICollection<SettingsTemplate> itemTemplates) : base(name, new ChildObservableCollection<IConfigurationSetting>())
+        public MultipleAdditiveContainerSetting(string name, List<SettingsTemplate> itemTemplates) : base(name, new ChildObservableCollection<IConfigurationSetting>())
         {
             ItemTemplates = itemTemplates;
             SelectedTemplate = itemTemplates.First();
@@ -69,6 +69,11 @@ namespace EthCanConfig.Models
             }
         }
 
+        public void AddSetting(int templateIndex)
+        {
+            var clone = ItemTemplates[templateIndex].Clone();
+            InnerSettings.Add(clone);
+        }
         public void DeleteAll()
         {
             InnerSettings.Clear();

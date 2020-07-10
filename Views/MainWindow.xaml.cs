@@ -39,6 +39,12 @@ namespace EthCanConfig.Views
         {
             viewModel = DataContext as MainWindowViewModel;
             viewModel.Settings.InnerItemChanged += Settings_InnerItemChanged;
+            viewModel.SettingsObject.PropertyChanged += SettingsObject_PropertyChanged;
+        }
+
+        private void SettingsObject_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            viewModel.Settings.InnerItemChanged += Settings_InnerItemChanged;
         }
 
         private void Settings_InnerItemChanged(IEnumerable<Models.IConfigurationSetting> item, Models.ChildObservableCollection<Models.IConfigurationSetting> collection)
@@ -69,7 +75,7 @@ namespace EthCanConfig.Views
 
         private void NewFile(object sender, RoutedEventArgs e)
         {
-            viewModel.SettingsObject = DefaultSettingsObject.defaultSettingsObject;
+            viewModel.SettingsObject = DefaultSettingsObject.GetDefaultSettingsObject;
             viewModel.SettingsDirty = false;
             viewModel.SavedFileName = null;
         }

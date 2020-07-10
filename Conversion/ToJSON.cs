@@ -4,6 +4,7 @@ using SharpDX.DXGI;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using Utf8Json;
@@ -47,8 +48,22 @@ namespace EthCanConfig.Conversion
 
         public static void WriteSeparatorIfNotTheLast(ref JsonWriter writer, IConfigurationSetting value)
         {
-            if (value.Parent != null && value.Parent.InnerSettings.IndexOf(value) != value.Parent.InnerSettings.Count - 1)
-                writer.WriteValueSeparator();
+            if (value.Parent != null)
+            {
+                ChildObservableCollection<IConfigurationSetting> innerSettings = value.Parent.InnerSettings;
+                var index = innerSettings.IndexOf(value);
+                if (index != innerSettings.Count - 1)
+                {
+                    for(int i = index+1;i< innerSettings.Count;i++)
+                    {
+                        if(innerSettings[i].IsEnabled)
+                        {
+                            writer.WriteValueSeparator();
+                            return;
+                        }
+                    }
+                }
+            }
         }
     }
 
