@@ -9,7 +9,7 @@ using Utf8Json;
 
 namespace EthCanConfig.Models
 {
-    public class NumberArraySetting<T> : TypedSetting<T[]>
+    public class ArraySetting<T> : TypedSetting<T[]>
     {
         [IgnoreDataMember]
         public string FancyName => "[ " + Name + " ]";
@@ -33,7 +33,10 @@ namespace EthCanConfig.Models
             }
             set
             {
-                string[] tokens = RemoveWhitespace(value).Split(',',StringSplitOptions.RemoveEmptyEntries);
+                var val = value;
+                if (typeof(T) != typeof(string))
+                    val = RemoveWhitespace(value);
+                string[] tokens = val.Split(',',StringSplitOptions.RemoveEmptyEntries);
                 T[] result = new T[tokens.Length];
                 for(int i = 0;i<tokens.Length;i++)
                 {
@@ -68,15 +71,15 @@ namespace EthCanConfig.Models
                 .Where(c => !char.IsWhiteSpace(c))
                 .ToArray());
         }
-        public NumberArraySetting(string name) : base(name, null)
+        public ArraySetting(string name) : base(name, null)
         {
         }
-        public NumberArraySetting(string name, T[] values) : base(name, values)
+        public ArraySetting(string name, T[] values) : base(name, values)
         {
         }
     }
     [JsonFormatter(typeof(SignedArraySettingsFormatter))]
-    public class SignedNumberArraySetting : NumberArraySetting<int>
+    public class SignedNumberArraySetting : ArraySetting<int>
     {
         public SignedNumberArraySetting(string name) : base(name)
         {
@@ -88,7 +91,7 @@ namespace EthCanConfig.Models
     }
 
     [JsonFormatter(typeof(UnsignedArraySettingsFormatter))]
-    public class UnsignedNumberArraySetting : NumberArraySetting<uint>
+    public class UnsignedNumberArraySetting : ArraySetting<uint>
     {
         public UnsignedNumberArraySetting(string name) : base(name)
         {

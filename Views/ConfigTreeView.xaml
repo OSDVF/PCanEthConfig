@@ -13,12 +13,12 @@
       </DataTemplate>
       <views:EnabledToOpacityConverter x:Key="etoConv"/>
     </TreeView.Resources>
-      <TreeView.DataTemplates>
+    <TreeView.DataTemplates>
       <DataTemplate DataType="models:EnumSetting">
         <StackPanel Classes="inner">
           <TextBlock Text="{Binding Name}" Foreground="Brown" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
           <DropDown Items="{Binding Values}" BorderBrush="AliceBlue" SelectedItem="{Binding TypedValue, Mode=TwoWay}" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
-          
+
           <ContentPresenter ContentTemplate="{StaticResource ResourceKey=notRequiredCheckbox}" />
         </StackPanel>
       </DataTemplate>
@@ -67,6 +67,15 @@
         </StackPanel>
       </DataTemplate>
 
+      <DataTemplate DataType="models:StringArraySetting">
+        <StackPanel>
+          <TextBlock Text="{Binding FancyName}" Foreground="Crimson" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+          <TextBox Text="{Binding StringValue, Mode = TwoWay}" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
+
+          <ContentPresenter ContentTemplate="{StaticResource notRequiredCheckbox}" Content="{Binding}"/>
+        </StackPanel>
+      </DataTemplate>
+
       <DataTemplate DataType="models:UnsignedNumberArraySetting">
         <StackPanel>
           <TextBlock Text="{Binding FancyName}" Foreground="Green" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
@@ -101,10 +110,10 @@
                   <ControlTemplate>
                     <Border BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
-                        <ItemsPresenter Name="PART_ItemsPresenter"
-                                        Items="{TemplateBinding Items}"
-                                        ItemsPanel="{TemplateBinding ItemsPanel}"
-                                        Margin="{TemplateBinding Padding}"/>
+                      <ItemsPresenter Name="PART_ItemsPresenter"
+                                      Items="{TemplateBinding Items}"
+                                      ItemsPanel="{TemplateBinding ItemsPanel}"
+                                      Margin="{TemplateBinding Padding}"/>
                     </Border>
                   </ControlTemplate>
                 </Setter>
@@ -113,7 +122,7 @@
           </TreeView>
           <StackPanel Orientation="Horizontal">
             <ContentPresenter ContentTemplate="{StaticResource notRequiredCheckbox}" Content="{Binding}"/>
-            
+
             <Button Command="{Binding DeleteItem}">
               <Image Source="/Assets/delete.png"/>
             </Button>
@@ -164,9 +173,9 @@
         <StackPanel>
           <TextBox Text="{Binding Name, Mode = TwoWay}" Foreground="MediumSlateBlue" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}" />
           <TextBox Text="{Binding Value, Mode = TwoWay}" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
-          
+
           <CheckBox IsChecked="{Binding IsEnabled}" Checked="OnCheckBoxCheck" Unchecked="OnCheckBoxUncheck"/>
-          
+
           <Button Command="{Binding MoveForward}" Classes="hideInactive">
             <Image Source="/Assets/down.png"/>
           </Button>

@@ -105,6 +105,13 @@ namespace EthCanConfig.Conversion
                     new StringSetting("destinationName", string.Empty) { IsRequired = false},
                     new UnsignedNumberSetting("destinationIndex",0) { IsRequired = false},
                 }),
+                new SettingsTemplate("dictionary",new ChildObservableCollection<IConfigurationSetting>()
+                {
+                    new HardCodedSetting("action","dictionary"),
+                    new StringSetting("inputName", string.Empty) { IsRequired = false},
+                    new UnsignedNumberArraySetting("inputIndexes"),
+                    new StringArraySetting("dictionary")
+                }),
                 new SettingsTemplate("sed",new ChildObservableCollection<IConfigurationSetting>()
                 {
                     new HardCodedSetting("action","sed"),

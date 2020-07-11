@@ -223,10 +223,10 @@ namespace EthCanConfig.Conversion
                 case "int32":
                     return DataTypes.int32;
 
-                case "lowEndian":
-                    return ByteOrder.bigEndian;
-                case "bigEndian":
+                case "littleEndian":
                     return ByteOrder.littleEndian;
+                case "bigEndian":
+                    return ByteOrder.bigEndian;
 
                 case "MSB":
                     return BitOrder.MSB;
@@ -273,7 +273,7 @@ namespace EthCanConfig.Conversion
             foreach (Dictionary<string, object> actionConverter in listener["converters"]["actions"])
             {
                 var outputActionConvs = outputConverters.InnerSettings["actions"] as MultipleAdditiveContainerSetting;
-                string[] actionTemplates = { "not", "mask", "lshift", "rshift", "concat", "shuffle", "swap", "printf", "sed", "regex", "nmeacc" };
+                string[] actionTemplates = { "not", "mask", "lshift", "rshift", "concat", "shuffle", "swap", "printf", "dictionary", "sed", "regex", "nmeacc" };
                 outputActionConvs.AddSetting(actionTemplates.IndexOf(actionConverter["action"]));
                 AddInnerSettingsByTemplateIndex(converterIndex, actionConverter, ref outputActionConvs);
                 converterIndex++;

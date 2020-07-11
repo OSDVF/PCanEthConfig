@@ -132,6 +132,36 @@ namespace EthCanConfig.Conversion
         }
     }
 
+    public class StringArraySettingsFormatter : TypedFormatter<string[]>, IJsonFormatter<StringArraySetting>
+    {
+        public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Serialize(ref JsonWriter writer, StringArraySetting value, IJsonFormatterResolver formatterResolver)
+        {
+            if (!value.IsEnabled)
+                return;
+            writer.WritePropertyName(value.Name);
+            writer.WriteBeginArray();
+            string[] typedValue = value.TypedValue;
+            if (typedValue != null)
+                for (int i = 0; i < typedValue.Length; i++)
+                {
+                    writer.WriteString(typedValue[i]);
+                    if (i != typedValue.Length - 1)
+                        writer.WriteValueSeparator();
+                }
+            writer.WriteEndArray();
+            WriteSeparatorIfNotTheLast(ref writer, value);
+        }
+
+        StringArraySetting IJsonFormatter<StringArraySetting>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class SignedArraySettingsFormatter : TypedFormatter<int[]>, IJsonFormatter<SignedNumberArraySetting>
     {
         public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
@@ -312,6 +342,12 @@ namespace EthCanConfig.Conversion
                 {
                     var fmt = formatterResolver.GetFormatterWithVerify<SignedNumberArraySetting>();
                     fmt.Serialize(ref writer, (SignedNumberArraySetting)inner, formatterResolver);
+                    continue;
+                }
+                else if (inner is StringArraySetting)
+                {
+                    var fmt = formatterResolver.GetFormatterWithVerify<StringArraySetting>();
+                    fmt.Serialize(ref writer, (StringArraySetting)inner, formatterResolver);
                     continue;
                 }
                 else if (inner is RegexSetting)
