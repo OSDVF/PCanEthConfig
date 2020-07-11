@@ -230,8 +230,8 @@ namespace EthCanConfig.Conversion
             foreach (Dictionary<string, object> outputConverter in listener["converters"]["output"])
             {
                 var outputActionConvs = outputConverters.InnerSettings["output"] as MultipleAdditiveContainerSetting;
-                string[] outputTemplates = { "printf" };
-                outputActionConvs.AddSetting(outputTemplates.IndexOf(outputConverter["output"]));
+                string[] outputTemplates = { "printf", "cansend" };
+                outputActionConvs.AddSetting(outputTemplates.IndexOf(outputConverter["type"]));
                 AddInnerSettingsByTemplateIndex(converterIndex, outputConverter, ref outputActionConvs);
                 converterIndex++;
             }

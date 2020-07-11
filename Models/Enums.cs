@@ -28,4 +28,8 @@ namespace EthCanConfig.Models
     {
         AND,OR
     }
+    enum DataTypes
+    {
+        uchar, uint8, int8, uint16, int16, uint32, int32, str
+    }
 }

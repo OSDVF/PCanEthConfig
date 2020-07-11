@@ -48,13 +48,13 @@ namespace EthCanConfig.Conversion
                 {
                     new HardCodedSetting("action","not"),
                     new StringSetting("inputName", string.Empty) { IsRequired = false},
-                    new UnsignedNumberSetting("inputIndex",0) { IsRequired = false}
+                    new UnsignedNumberSetting("inputIndex",0),
                 }),
                 new SettingsTemplate("mask",new ChildObservableCollection<IConfigurationSetting>()
                 {
                     new HardCodedSetting("action","mask"),
                     new StringSetting("inputName", string.Empty) { IsRequired = false},
-                    new UnsignedNumberSetting("inputIndex",0) { IsRequired = false},
+                    new UnsignedNumberSetting("inputIndex",0),
                     new RegexSetting("mask","FF"),
                     new EnumSetting("op", MaskOperations.OR)
                 }),
@@ -62,14 +62,14 @@ namespace EthCanConfig.Conversion
                 {
                     new HardCodedSetting("action","lshift"),
                     new StringSetting("inputName", string.Empty) { IsRequired = false},
-                    new UnsignedNumberSetting("inputIndex",0) { IsRequired = false},
+                    new UnsignedNumberSetting("inputIndex",0),
                     new UnsignedNumberSetting("amount",0)
                 }),
                 new SettingsTemplate("rshift",new ChildObservableCollection<IConfigurationSetting>()
                 {
                     new HardCodedSetting("action","rshift"),
                     new StringSetting("inputName", string.Empty) { IsRequired = false},
-                    new UnsignedNumberSetting("inputIndex",0) { IsRequired = false},
+                    new UnsignedNumberSetting("inputIndex",0),
                     new UnsignedNumberSetting("amount",0)
                 }),
                 new SettingsTemplate("concat",new ChildObservableCollection<IConfigurationSetting>()
@@ -107,13 +107,13 @@ namespace EthCanConfig.Conversion
                 {
                     new HardCodedSetting("action","sed"),
                     new StringSetting("inputName", string.Empty) { IsRequired = false},
-                    new UnsignedNumberSetting("inputIndex",0) { IsRequired = false},
+                    new UnsignedNumberSetting("inputIndex",0),
                 }),
                 new SettingsTemplate("regex",new ChildObservableCollection<IConfigurationSetting>()
                 {
                     new HardCodedSetting("action","regex"),
                     new StringSetting("inputName", string.Empty) { IsRequired = false},
-                    new UnsignedNumberSetting("inputIndex",0) { IsRequired = false},
+                    new UnsignedNumberSetting("inputIndex",0),
                     new StringSetting("regex", string.Empty),
                     new StringSetting("destinationName", string.Empty) { IsRequired = false},
                     new UnsignedNumberSetting("destinationIndex",0) { IsRequired = false},
@@ -122,7 +122,7 @@ namespace EthCanConfig.Conversion
                 {
                     new HardCodedSetting("action","nmeacc"),
                     new StringSetting("inputName", string.Empty) { IsRequired = false},
-                    new UnsignedNumberSetting("inputIndex",0) { IsRequired = false},
+                    new UnsignedNumberSetting("inputIndex",0),
                     new StringSetting("destinationName", string.Empty) { IsRequired = false},
                     new UnsignedNumberSetting("destinationIndex",0) { IsRequired = false},
                 }),
@@ -134,6 +134,16 @@ namespace EthCanConfig.Conversion
                     new HardCodedSetting("type","printf"),
                     new StringSetting("inputName", string.Empty) { IsRequired = false},
                     new StringSetting("format", string.Empty),
+                }),
+                new SettingsTemplate("cansend", new ChildObservableCollection<IConfigurationSetting>()
+                {
+                    new HardCodedSetting("type","cansend"),
+                    new StringSetting("inputName", string.Empty) { IsRequired = false},
+                    new UnsignedNumberSetting("inputIndex",0),
+                    new StringSetting("channel","can0"),
+                    new HexadecimalSetting("pgn",0x1FFFFFFF,8),
+                    new UnsignedNumberSetting("firstBitIndex",0),
+                    new EnumSetting("dataType",DataTypes.uint8)
                 })
             })
         };

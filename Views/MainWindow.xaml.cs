@@ -49,7 +49,7 @@ namespace EthCanConfig.Views
 
         private void Settings_InnerItemChanged(IEnumerable<Models.IConfigurationSetting> item, Models.ChildObservableCollection<Models.IConfigurationSetting> collection)
         {
-            previewTextBox.Text = viewModel.JSONPreview;
+            viewModel.RaisePropertyChanged("JSONPreview");
             viewModel.SettingsDirty = true;
         }
 

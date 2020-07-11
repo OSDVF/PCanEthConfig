@@ -30,7 +30,6 @@ namespace EthCanConfig.Models
             {
                 InnerSettings = innerSettings;
             }
-            InnerSettings.Parent = this;
         }
     }
 

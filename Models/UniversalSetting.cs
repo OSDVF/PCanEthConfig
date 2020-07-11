@@ -37,8 +37,8 @@ namespace EthCanConfig.Models
             get => innerSettings; set
             {
                 innerSettings = value;
+                innerSettings.Parent = this;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("InnerSettings"));
-                innerSettings.InvokeCollectionChanged();
             }
         }
         [IgnoreDataMember]
