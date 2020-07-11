@@ -14,22 +14,22 @@ namespace EthCanConfig.Models
     }
     enum Protocol
     {
-        tcp,udp
+        tcp, udp
     }
     enum ByteOrder
     {
-        bigEndian,lowEndian
+        bigEndian, littleEndian
     }
     enum BitOrder
     {
-        MSB,LSB
+        MSB, LSB
     }
     enum MaskOperations
     {
-        AND,OR
+        AND, OR
     }
     enum DataTypes
     {
-        uchar, uint8, int8, uint16, int16, uint32, int32, str
+        uchar, uint4, int4, uint8, int8, uint16, int16, uint32, int32, str
     }
 }

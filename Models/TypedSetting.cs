@@ -1,6 +1,7 @@
 ﻿using EthCanConfig.Conversion;
 using ReactiveUI;
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Utf8Json;
 
@@ -9,7 +10,7 @@ namespace EthCanConfig.Models
     public class TypedSetting<T> : IConfigurationSetting
     {
         public virtual string Name { get; set; }
-        public object Value
+        public virtual object Value
         {
             get { return TypedValue; }
             set

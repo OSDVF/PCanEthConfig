@@ -153,7 +153,7 @@ namespace EthCanConfig.Conversion
                 routes.InnerSettings.Add(new SettingsTemplate(new ChildObservableCollection<IConfigurationSetting>()
                 {
                     new StringSetting("name",inputRoute.ContainsKey("name")? (string)inputRoute["name"]:string.Empty),
-                    new EnumSetting("type",canin?RouteType.canin:RouteType.canout),
+                    new HardCodedSetting("type",canin?RouteType.canin:RouteType.canout),
                     canin ? CanInListenersDeserialize(inputRoute["listeners"],listTempate):CanOutListenersDeserialize(inputRoute["listeners"],listTempate)
                 }));
             }
@@ -177,15 +177,68 @@ namespace EthCanConfig.Conversion
                 DeserializeConverters(listener, outputConverters);
 
             }
-            return new AdditiveContainerSetting("listeners", listenerTemplate) { InnerSettings = outListeners, IsRequired = false};
+            return new AdditiveContainerSetting("listeners", listenerTemplate) { InnerSettings = outListeners, IsRequired = false };
         }
 
         private static void AddInnerSettingsByTemplateIndex(int instantiatedTemplateIndex, Dictionary<string, object> converter, ref MultipleAdditiveContainerSetting setting)
         {
-            foreach (var settingKey in converter.Keys)
+            var innerSettings = ((IContainerSetting)setting.InnerSettings[instantiatedTemplateIndex]).InnerSettings;
+            foreach (var innerSetting in innerSettings)
             {
-                ((IContainerSetting)setting.InnerSettings[instantiatedTemplateIndex]).InnerSettings[settingKey].Value = converter[settingKey];
+                bool keyIsPresent = ContainsKey(converter, innerSetting.Name);
+                innerSetting.IsEnabled = keyIsPresent;
+                if(keyIsPresent)
+                {
+                    var val = converter[innerSetting.Name];
+                    if (val is string str)
+                    {
+                        var en = mapStringToEnum(str);
+                        if (en == null)
+                            innerSetting.Value = str;
+                        else innerSetting.Value = en;
+                    }
+                    else innerSetting.Value = val;
+                }
             }
+        }
+
+        private static Enum mapStringToEnum(string str)
+        {
+            switch (str)
+            {
+                case "uchar":
+                    return DataTypes.uchar;
+                case "uint4": return DataTypes.uint4;
+                case "int4": return DataTypes.int4;
+                case "uint8":
+                    return DataTypes.uint8;
+                case "int8":
+                    return DataTypes.int8;
+                case "uint16":
+                    return DataTypes.uint16;
+                case "int16":
+                    return DataTypes.int16;
+                case "uint32":
+                    return DataTypes.uint32;
+                case "int32":
+                    return DataTypes.int32;
+
+                case "lowEndian":
+                    return ByteOrder.bigEndian;
+                case "bigEndian":
+                    return ByteOrder.littleEndian;
+
+                case "MSB":
+                    return BitOrder.MSB;
+                case "LSB":
+                    return BitOrder.LSB;
+
+                case "AND":
+                    return MaskOperations.AND;
+                case "OR":
+                    return MaskOperations.OR;
+            }
+            return null;
         }
 
         private static void DeserializeConverters(dynamic listener, IContainerSetting outputConverters)

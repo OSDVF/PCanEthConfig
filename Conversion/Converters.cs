@@ -79,6 +79,8 @@ namespace EthCanConfig.Conversion
                     new UnsignedNumberSetting("firstIndex",0),
                     new StringSetting("secondName", string.Empty),
                     new UnsignedNumberSetting("secondIndex",0),
+                    new StringSetting("destinationName", string.Empty),
+                    new UnsignedNumberSetting("destinationIndex",0),
                 }),
                 new SettingsTemplate("shuffle",new ChildObservableCollection<IConfigurationSetting>()
                 {

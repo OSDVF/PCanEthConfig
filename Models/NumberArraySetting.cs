@@ -43,6 +43,25 @@ namespace EthCanConfig.Models
             }
         }
 
+        public override object Value
+        {
+            get { return TypedValue; }
+            set
+            {
+                if (value is string str)
+                    StringValue = str;
+                else if (value is List<object> list)
+                {
+                    if (TypedValue == null)
+                        TypedValue = new T[list.Count];
+                    for(int i=0;i<list.Count;i++)
+                    {
+                        TypedValue[i] = (T)Convert.ChangeType(list[i], typeof(T));
+                    }
+                }
+            }
+        }
+
         public static string RemoveWhitespace(string input)
         {
             return new string(input.ToCharArray()
