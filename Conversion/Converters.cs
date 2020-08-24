@@ -143,6 +143,7 @@ namespace EthCanConfig.Conversion
                     new HardCodedSetting("type","printf"),
                     new StringSetting("inputName", string.Empty) { IsRequired = false},
                     new StringSetting("format", string.Empty),
+                    new UnsignedNumberSetting("waitFor", 0) { IsRequired = false, IsEnabled = false},
                 }),
                 new SettingsTemplate("cansend", new ChildObservableCollection<IConfigurationSetting>()
                 {
@@ -152,7 +153,8 @@ namespace EthCanConfig.Conversion
                     new StringSetting("channel","can0"),
                     new HexadecimalSetting("pgn",0x1FFFFFFF,8),
                     new UnsignedNumberSetting("firstBitIndex",0),
-                    new EnumSetting("dataType",DataTypes.uint8)
+                    new EnumSetting("dataType",DataTypes.uint8),
+                    new UnsignedNumberSetting("waitFor", 0) { IsRequired = false, IsEnabled = false},
                 })
             })
         };

@@ -1,25 +1,29 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Html;
 using Avalonia.Data.Converters;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using EthCanConfig.Conversion;
 using EthCanConfig.Models;
 using EthCanConfig.ViewModels;
 using ReactiveUI;
+using Renci.SshNet.Common;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace EthCanConfig.Views
 {
     public class MainWindow : Window
     {
         private TextBox previewTextBox;
+        private TextBlock uploadState;
         private MainWindowViewModel viewModel;
+        private ProgressBar uploading;
         public MainWindow()
         {
             InitializeComponent();
@@ -32,6 +36,8 @@ namespace EthCanConfig.Views
         {
             AvaloniaXamlLoader.Load(this);
             previewTextBox = this.FindControl<TextBox>("previewTextBox");
+            uploading = this.FindControl<ProgressBar>("uploadingProgressBar");
+            uploadState = this.FindControl<TextBlock>("uploadState");
             DataContextChanged += MainWindow_DataContextChanged;
         }
 
@@ -40,6 +46,25 @@ namespace EthCanConfig.Views
             viewModel = DataContext as MainWindowViewModel;
             viewModel.Settings.InnerItemChanged += Settings_InnerItemChanged;
             viewModel.SettingsObject.PropertyChanged += SettingsObject_PropertyChanged;
+            viewModel.DeviceInfo.Uploading += UploadProgress;
+        }
+
+        private void UploadProgress(object sender, ScpUploadEventArgs e)
+        {
+            var percent = ((float)e.Uploaded / e.Size) * 100f;
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                uploading.IsVisible = (percent % 100) != 0;
+                uploading.Value = percent;
+                if (percent == 100)
+                    uploadState.IsVisible = true;
+
+            });
+            if (percent == 100)
+            {
+                Thread.Sleep(2000);
+                Dispatcher.UIThread.InvokeAsync(()=> uploadState.IsVisible = false);
+            }
         }
 
         private void SettingsObject_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

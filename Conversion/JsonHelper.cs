@@ -170,8 +170,13 @@ namespace EthCanConfig.Conversion
                 outListeners.Add(new SettingsTemplate(new ChildObservableCollection<IConfigurationSetting>()
                 {
                     new StringSetting("channel",listener["channel"]),
+                    new StringSetting("endpoint",GetValOrNull<string>(listener,"endpoint")) { IsEnabled = ContainsKey(listener,"endpoint"),IsRequired = false},
+                    new UnsignedNumberSetting("port",GetValOrNull<uint>(listener,"port")??25555) { IsEnabled = ContainsKey(listener,"port"),IsRequired = false},
+                    new EnumSetting("protocol",GetValOrNull<string>(listener,"protocol") == "tcp"? Protocol.tcp:Protocol.udp) { IsEnabled = ContainsKey(listener,"protocol"),IsRequired = false},
                     new HexadecimalSetting("filter",GetValOrNull<string>(listener,"filter"),8) { IsEnabled = ContainsKey(listener,"filter"),IsRequired = false},
                     new HexadecimalSetting("filterMask",GetValOrNull<string>(listener,"filterMask"),8) { IsEnabled = ContainsKey(listener,"filterMask"),IsRequired = false},
+                    new UnsignedNumberSetting("setFlag",GetValOrNull<uint>(listener,"setFlag")) { IsEnabled = ContainsKey(listener,"setFlag"),IsRequired = false},
+                    new StringSetting("flagStore", GetValOrNull<string>(listener,"flagStore")??"global storename") { IsRequired = false, IsEnabled = ContainsKey(listener,"flagStore")},
                     outputConverters
                 }));
                 DeserializeConverters(listener, outputConverters);
@@ -187,7 +192,7 @@ namespace EthCanConfig.Conversion
             {
                 bool keyIsPresent = ContainsKey(converter, innerSetting.Name);
                 innerSetting.IsEnabled = keyIsPresent;
-                if(keyIsPresent)
+                if (keyIsPresent)
                 {
                     var val = converter[innerSetting.Name];
                     if (val is string str)
@@ -304,6 +309,8 @@ namespace EthCanConfig.Conversion
                     new RegexSetting("endsWith",GetValOrNull<string>(listener,"endsWith")) { IsEnabled = ContainsKey(listener,"endsWith"),IsRequired = false},
                     new BoolSetting("includeBorders",listener["includeBorders"]),
                     new RegexSetting("filter",GetValOrNull<string>(listener,"filter")) { IsEnabled = ContainsKey(listener,"filter"),IsRequired = false},
+                    new UnsignedNumberSetting("setFlag",GetValOrNull<uint>(listener,"setFlag")) { IsEnabled = ContainsKey(listener,"setFlag"),IsRequired = false},
+                    new StringSetting("flagStore", GetValOrNull<string>(listener,"flagStore")??"global storename") { IsRequired = false, IsEnabled = ContainsKey(listener,"flagStore")},
                     outputConverters
                 }));
                 DeserializeConverters(listener, outputConverters);

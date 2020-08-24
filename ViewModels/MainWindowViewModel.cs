@@ -10,14 +10,14 @@ using System.Net.Http.Headers;
 using EthCanConfig.Conversion;
 using Avalonia.Controls;
 using ReactiveUI;
+using System.Reflection;
 
 namespace EthCanConfig.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        public string Greeting => "Welcome to Avalonia!";
-        public IPAddress ConnectedDevice;
-        public string ConnectedDeviceIP => ConnectedDevice == null ? "Unavaliable" : ConnectedDevice.ToString();
+        public DeviceInfo DeviceInfo { get; } = new DeviceInfo();
+        
         public ContainerSetting SettingsObject
         {
             get => settingsObject; set
@@ -43,6 +43,8 @@ namespace EthCanConfig.ViewModels
         public string JSONHTMLPreview => JsonHelper.ToHTMLPreview(JsonHelper.SyntaxHighlightJson(JSONPreview));
 
         public ChildObservableCollection<IConfigurationSetting> Settings =>SettingsObject.InnerSettings;
+
+        private string SoftwareVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         private void AddCustomSetting()
         {

@@ -23,6 +23,7 @@
       </Grid.ColumnDefinitions>
       <Grid.Resources>
         <views:BooleanToDirtyTextConverter x:Key="btdc"/>
+        <models:BoolToConnectedConverter x:Key="btcc" />
       </Grid.Resources>
       <StackPanel Orientation="Horizontal" Grid.Column="0">
         <Menu Height="20">
@@ -33,11 +34,22 @@
             <MenuItem Header="Save As" Icon="" Click="SaveAs"/>
           </MenuItem>
         </Menu>
-        <TextBlock Text="Device:" FontWeight="Bold"/>
-        <TextBlock Text="{Binding ConnectedDeviceIP}" />
-        <Button Content="Connect" Command="{Binding DeviceInfo.Connect}"/>
-        <Button Content="Show Info" Command="{Binding DeviceInfo.ShowInfo}"/>
-        <Button Content="Upload" Command="{Binding DeviceInfo.UploadSettings}" CommandParameter="{Binding SavedFileName}"/>
+        <Line StartPoint="0,0" EndPoint="0,30" Stroke="Black" StrokeThickness="0.5" Margin="5,0,10,0"/>
+        <TextBlock Text="Device: " FontWeight="Bold"/>
+        <TextBox Text="{Binding DeviceInfo.IPToConnect, Mode=TwoWay}" Watermark="IP Address" />
+        <TextBox Text="{Binding DeviceInfo.Username, Mode=TwoWay}" Watermark="Username" />
+        <TextBox Text="{Binding DeviceInfo.Password, Mode=TwoWay}" Watermark="Password" PasswordChar="•" />
+        <Button Content="Connect" Command="{Binding DeviceInfo.Connect}" CommandParameter="{Binding, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
+        <Button Content="Device Info" Command="{Binding DeviceInfo.ShowInfo}"/>
+        <Line StartPoint="0,0" EndPoint="0,30" Stroke="Black" StrokeThickness="0.5" Margin="5,0,10,0"/>
+        <TextBlock Text="Software: " FontWeight="Bold"/>
+        <TextBlock Text="Current version "/>
+        <TextBlock Text="{Binding SoftwareVersion}"/>
+        <Button Content="Upload Configuration File" Command="{Binding DeviceInfo.UploadSettings}" CommandParameter="{Binding, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
+        </Button>
+        <Button Content="Update Software" Command="{Binding DeviceInfo.UploadSoftware}" CommandParameter="{Binding, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
+        <ProgressBar IsVisible="False" x:Name="uploadingProgressBar" Maximum="100" />
+        <TextBlock x:Name="uploadState" IsVisible="False" Text="Successfully uploaded"/>
       </StackPanel>
       <TextBlock Text="{Binding SettingsDirty, Converter={StaticResource btdc}}" FontFamily="Segoe UI Emoji" HorizontalAlignment="Right"  Grid.Column="1" Margin="5"/>
       <Grid.Styles>

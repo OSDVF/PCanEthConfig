@@ -35,6 +35,8 @@ namespace EthCanConfig.Models
                         new RegexSetting("endsWith","/\\*[0-9a-fA-F]+/") { IsEnabled = false,IsRequired = false},
                         new BoolSetting("includeBorders",false),
                         new RegexSetting("filter","/.*/") { IsEnabled = false,IsRequired = false},
+                        new UnsignedNumberSetting("setFlag", 0) { IsRequired = false, IsEnabled = false},
+                        new StringSetting("flagStore", "global storename") { IsRequired = false, IsEnabled = false},
                         new ContainerSetting("converters", Converters.converters)
                     })){IsRequired=false}
                 }),
@@ -44,8 +46,13 @@ namespace EthCanConfig.Models
                     new HardCodedSetting("type", RouteType.canin),
                     new AdditiveContainerSetting("listeners",new SettingsTemplate(new ChildObservableCollection<IConfigurationSetting>(){
                         new StringSetting("channel","can0"),
+                        new StringSetting("endpoint","192.168.1.2") { IsEnabled = false,IsRequired = false},
+                        new UnsignedNumberSetting("port", 25555) { IsEnabled = false,IsRequired = false},
+                        new EnumSetting("protocol", Protocol.udp) { IsEnabled = false,IsRequired = false},
                         new HexadecimalSetting("filter",0x1FFFFFFF,8) { IsEnabled = false,IsRequired = false},
                         new HexadecimalSetting("filterMask",0x1FFFFFFF,8) { IsEnabled = false,IsRequired = false},
+                        new UnsignedNumberSetting("setFlag", 0) { IsRequired = false, IsEnabled = false},
+                        new StringSetting("flagStore", "global storename") { IsRequired = false, IsEnabled = false},
                         new ContainerSetting("converters", Converters.converters)
                     })){IsRequired=false}
                 })

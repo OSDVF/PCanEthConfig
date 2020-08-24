@@ -15,11 +15,11 @@
     </TreeView.Resources>
     <TreeView.DataTemplates>
       <DataTemplate DataType="models:EnumSetting">
-        <StackPanel Classes="inner">
+        <StackPanel>
           <TextBlock Text="{Binding Name}" Foreground="Brown" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
           <DropDown Items="{Binding Values}" BorderBrush="AliceBlue" SelectedItem="{Binding TypedValue, Mode=TwoWay}" Opacity="{Binding IsEnabled, Converter={StaticResource etoConv}}"/>
 
-          <ContentPresenter ContentTemplate="{StaticResource ResourceKey=notRequiredCheckbox}" />
+          <ContentPresenter ContentTemplate="{StaticResource ResourceKey=notRequiredCheckbox}" Content="{Binding}" />
         </StackPanel>
       </DataTemplate>
 
