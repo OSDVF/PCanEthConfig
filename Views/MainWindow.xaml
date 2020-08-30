@@ -45,9 +45,9 @@
         <TextBlock Text="Software: " FontWeight="Bold"/>
         <TextBlock Text="Current version "/>
         <TextBlock Text="{Binding SoftwareVersion}"/>
-        <Button Content="Upload Configuration File" Command="{Binding DeviceInfo.UploadSettings}" CommandParameter="{Binding, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
+        <Button Content="Upload Configuration File" Command="{Binding DeviceInfo.UploadSettings}" CommandParameter="{Binding, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" ToolTip.Tip="Reboot will be required">
         </Button>
-        <Button Content="Update Software" Command="{Binding DeviceInfo.UploadSoftware}" CommandParameter="{Binding, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
+        <Button Content="Update Software" Command="{Binding DeviceInfo.UploadSoftware}" CommandParameter="{Binding, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" ToolTip.Tip="Reboot will be required"/>
         <ProgressBar IsVisible="False" x:Name="uploadingProgressBar" Maximum="100" />
         <TextBlock x:Name="uploadState" IsVisible="False" Text="Successfully uploaded"/>
       </StackPanel>

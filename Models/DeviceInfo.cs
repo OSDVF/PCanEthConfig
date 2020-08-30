@@ -15,7 +15,7 @@ namespace EthCanConfig.Models
     public class DeviceInfo : ReactiveObject
     {
         private readonly string binaryPath = "/mnt/user/eth-can-router";
-        private readonly string scriptPath = "/etc/init.d/08eth-can-router.sh";
+        private readonly string scriptPath = "/etc/init.d/S100eth-can-router";
         public bool Connected { get => connected; set => connected = value; }
         public string IPToConnect { get => iPToConnect; set => iPToConnect = value; }
         public string Password { get; set; }
@@ -97,11 +97,12 @@ namespace EthCanConfig.Models
                 Task.Run(() =>
                 {
                     scp.Upload(str, binaryPath);
-                    ssh.RunCommand($"chmod +x {binaryPath}");
                     scp.Upload(str2, scriptPath);
-                    ssh.RunCommand(scriptPath + " start");
+                    ssh.RunCommand($"chmod +x {binaryPath} {scriptPath}");
                     str.Close();
                     str2.Close();
+                    ssh.RunCommand("reboot");
+                    Reconnect(parentWindow);
                 }
                 );
             }
@@ -134,12 +135,58 @@ namespace EthCanConfig.Models
             try
             {
                 PrepareRemoteDirectories();
-                var str = new MemoryStream(Encoding.UTF8.GetBytes(((MainWindowViewModel)parentWindow.DataContext).JSONPreview));
+                //Now pretty ugly setting parsing into platform config
+                var context = ((MainWindowViewModel)parentWindow.DataContext);
+                var net = context.SettingsObject.InnerSettings["net"] as ContainerSetting;
+                var ip = net.InnerSettings["ip"].Value as string;
+                var mask = net.InnerSettings["mask"].Value as string;
+                var gateway = net.InnerSettings["gateway"].Value as string;
+                var channels = (context.SettingsObject.InnerSettings["channels"] as ContainerSetting);
+                string bitrate0 = "250000";
+                string bitrate1 = "250000";
+                try
+                {
+                    foreach (ContainerSetting bitrateSetting in channels.InnerSettings)
+                    {
+                        if (bitrateSetting.InnerSettings["name"].Value as string == "can0")
+                        {
+                            bitrate0 = bitrateSetting.InnerSettings["bitrate"].Value.ToString();
+                        }
+                        else if (bitrateSetting.InnerSettings["name"].Value as string == "can1")
+                        {
+                            bitrate1 = bitrateSetting.InnerSettings["bitrate"].Value.ToString();
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    //No bitrate settings found
+                }
+                var str = new MemoryStream(Encoding.UTF8.GetBytes(context.JSONPreview));
+                var str2 = new MemoryStream(Encoding.UTF8.GetBytes(//PEAK Configuration files
+                    @$"WLAN_DRIVER_REGCODE=
+BT_DRIVER=
+IP_ADDRESS={ip}
+IP_NETMASK={mask}
+IP_GATEWAY={gateway}
+IP_DNS1=
+IP_DNS2=
+CAN0_BITRATE={bitrate0}
+CAN1_BITRATE={bitrate1}
+WLAN_MODE=WLAN
+WLAN_SECURITY=/mnt/user/wpa_supplicant.conf
+"));
                 Task.Run(() =>
                 {
                     scp.Upload(str, "/mnt/user/default.json");
+                    scp.Upload(str2, "/mnt/user/platform.config");
+                    ssh.RunCommand("reboot");
                     str.Close();
+                    str2.Close();
+                    Reconnect(parentWindow);
                 });
+
+                IPToConnect = ip;
             }
             catch (Exception e)
             {
@@ -152,6 +199,14 @@ namespace EthCanConfig.Models
                 });
                 m.ShowDialog(parentWindow);
             }
+        }
+
+        private void Reconnect(Window parentWindow)
+        {
+            ssh.Disconnect();
+            scp.Disconnect();
+            Connected = false;
+            Connect(parentWindow);//Reconnect after reboot
         }
     }
     public class BoolToConnectedConverter : FuncValueConverter<bool, string>
