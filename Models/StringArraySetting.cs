@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using Utf8Json;
 using EthCanConfig.Conversion;
+using System.Collections.ObjectModel;
 
 namespace EthCanConfig.Models
 {
@@ -20,7 +21,7 @@ namespace EthCanConfig.Models
                 else if (value is List<object> list)
                 {
                     if (TypedValue == null)
-                        TypedValue = new string[list.Count];
+                        TypedValue = new ObservableCollection<string>(new List<string>(list.Count));
                     for (int i = 0; i < list.Count; i++)
                     {
                         TypedValue[i] = list[i].ToString();
@@ -28,10 +29,10 @@ namespace EthCanConfig.Models
                 }
             }
         }
-        public StringArraySetting(string name) : base(name, null)
+        public StringArraySetting(string name) : base(name, new ObservableCollection<string>())
         {
         }
-        public StringArraySetting(string name, string[] values) : base(name, values)
+        public StringArraySetting(string name, string[] values) : base(name, new ObservableCollection<string>(values))
         {
         }
     }

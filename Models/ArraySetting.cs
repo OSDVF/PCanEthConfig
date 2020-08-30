@@ -1,6 +1,7 @@
 ﻿using EthCanConfig.Conversion;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -9,7 +10,7 @@ using Utf8Json;
 
 namespace EthCanConfig.Models
 {
-    public class ArraySetting<T> : TypedSetting<T[]>
+    public class ArraySetting<T> : TypedSetting<ObservableCollection<T>>
     {
         [IgnoreDataMember]
         public string FancyName => "[ " + Name + " ]";
@@ -18,7 +19,7 @@ namespace EthCanConfig.Models
         {
             get
             {
-                if (TypedValue == null||TypedValue.Length == 0)
+                if (TypedValue == null||TypedValue.Count == 0)
                     return string.Empty;
 
                 StringBuilder stringBuilder = new StringBuilder(5);
@@ -37,10 +38,10 @@ namespace EthCanConfig.Models
                 if (typeof(T) != typeof(string))
                     val = RemoveWhitespace(value);
                 string[] tokens = val.Split(',',StringSplitOptions.RemoveEmptyEntries);
-                T[] result = new T[tokens.Length];
+                ObservableCollection<T> result = new ObservableCollection<T>();
                 for(int i = 0;i<tokens.Length;i++)
                 {
-                    result[i] = (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(tokens[i]);
+                    result.Add((T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(tokens[i]));
                 }
                 TypedValue = result;
             }
@@ -53,14 +54,18 @@ namespace EthCanConfig.Models
             {
                 if (value is string str)
                     StringValue = str;
-                else if (value is List<object> list)
+                else if (value is IList<object> list)
                 {
                     if (TypedValue == null)
-                        TypedValue = new T[list.Count];
+                        TypedValue = new ObservableCollection<T>();
                     for(int i=0;i<list.Count;i++)
                     {
-                        TypedValue[i] = (T)Convert.ChangeType(list[i], typeof(T));
+                        TypedValue.Add((T)Convert.ChangeType(list[i], typeof(T)));
                     }
+                }
+                else
+                {
+                    TypedValue = (ObservableCollection<T>)value;
                 }
             }
         }
@@ -74,7 +79,7 @@ namespace EthCanConfig.Models
         public ArraySetting(string name) : base(name, null)
         {
         }
-        public ArraySetting(string name, T[] values) : base(name, values)
+        public ArraySetting(string name, ObservableCollection<T> values) : base(name, values)
         {
         }
     }
@@ -85,7 +90,7 @@ namespace EthCanConfig.Models
         {
         }
 
-        public SignedNumberArraySetting(string name, int[] values) : base(name, values)
+        public SignedNumberArraySetting(string name, int[] values) : base(name, new ObservableCollection<int>(values))
         {
         }
     }
@@ -97,7 +102,7 @@ namespace EthCanConfig.Models
         {
         }
 
-        public UnsignedNumberArraySetting(string name, uint[] values) : base(name, values)
+        public UnsignedNumberArraySetting(string name, uint[] values) : base(name, new ObservableCollection<uint>(values))
         {
         }
     }

@@ -1,7 +1,11 @@
 ﻿using DynamicData;
 using EthCanConfig.Models;
+using SharpDX.Direct2D1;
+using SharpDX.DXGI;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -202,6 +206,38 @@ namespace EthCanConfig.Conversion
                             innerSetting.Value = str;
                         else innerSetting.Value = en;
                     }
+                    else if (val is List<object> lst)
+                    {
+                        if (lst.Count != 0)
+                        {
+                            if(innerSetting.Value == null&& innerSetting is ITypedSetting typedInnerSetting)
+                            {
+                                var newCollection = Activator.CreateInstance(typedInnerSetting.GetSettingType());
+                                innerSetting.Value = newCollection;
+                            }
+                            var outputCol = innerSetting.Value as IList;
+                            outputCol.Clear();//Because there can be some items cloned from template
+                            for (int i = 0; i < lst.Count; i++)
+                            {
+                                if(lst[i] is string lstStr)//String arrays
+                                {
+                                    var en = mapStringToEnum(lstStr);
+                                    if (en == null)
+                                    {
+                                        outputCol.Add(lstStr);
+                                    }
+                                    else
+                                    {
+                                        outputCol.Add(en);
+                                    }
+                                }
+                                else//For other arrays
+                                {
+                                    outputCol.Add(Convert.ChangeType(lst[i],outputCol.GetType().GetGenericArguments()[0]));
+                                }
+                            }
+                        }
+                    }
                     else innerSetting.Value = val;
                 }
             }
@@ -211,6 +247,12 @@ namespace EthCanConfig.Conversion
         {
             switch (str)
             {
+                case "normal":
+                    return LogLevel.normal;
+                case "no":
+                    return LogLevel.no;
+                case "all":
+                    return LogLevel.all;
                 case "uchar":
                     return DataTypes.uchar;
                 case "uint4": return DataTypes.uint4;

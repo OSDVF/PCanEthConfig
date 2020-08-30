@@ -110,7 +110,7 @@ namespace EthCanConfig.Conversion
             throw new System.NotImplementedException();
         }
     }
-    public class UnsignedNumberSettingFormatter : TypedFormatter<uint[]>, IJsonFormatter<UnsignedNumberSetting>
+    public class UnsignedNumberSettingFormatter : TypedFormatter<uint>, IJsonFormatter<UnsignedNumberSetting>
     {
         public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
         {
@@ -132,6 +132,37 @@ namespace EthCanConfig.Conversion
         }
     }
 
+    public class EnumArraySettingFormatter : TypedFormatter<Enum[]>, IJsonFormatter<EnumArraySetting>
+    {
+        public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Serialize(ref JsonWriter writer, EnumArraySetting value, IJsonFormatterResolver formatterResolver)
+        {
+            if (!value.IsEnabled)
+                return;
+            writer.WritePropertyName(value.Name);
+            writer.WriteBeginArray();
+            var typedValue = value.TypedValue;
+            if (typedValue != null)
+                for (int i = 0; i < typedValue.Count; i++)
+                {
+                    writer.WriteString(typedValue[i].ToString());
+                    if (i != typedValue.Count - 1)
+                        writer.WriteValueSeparator();
+                }
+            writer.WriteEndArray();
+            WriteSeparatorIfNotTheLast(ref writer, value);
+        }
+
+        EnumArraySetting IJsonFormatter<EnumArraySetting>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
     public class StringArraySettingsFormatter : TypedFormatter<string[]>, IJsonFormatter<StringArraySetting>
     {
         public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
@@ -145,7 +176,7 @@ namespace EthCanConfig.Conversion
                 return;
             writer.WritePropertyName(value.Name);
             writer.WriteBeginArray();
-            string[] typedValue = value.TypedValue;
+            string[] typedValue = value.TypedValue.ToArray();
             if (typedValue != null)
                 for (int i = 0; i < typedValue.Length; i++)
                 {
@@ -175,12 +206,12 @@ namespace EthCanConfig.Conversion
                 return;
             writer.WritePropertyName(value.Name);
             writer.WriteBeginArray();
-            int[] typedValue = value.TypedValue;
+            var typedValue = value.TypedValue;
             if (typedValue != null)
-                for (int i = 0; i < typedValue.Length;i++)
+                for (int i = 0; i < typedValue.Count;i++)
                 {
                     writer.WriteInt32(typedValue[i]);
-                    if (i != typedValue.Length - 1)
+                    if (i != typedValue.Count - 1)
                         writer.WriteValueSeparator();
                 }
             writer.WriteEndArray();
@@ -193,7 +224,7 @@ namespace EthCanConfig.Conversion
         }
     }
 
-    public class UnsignedArraySettingsFormatter : TypedFormatter<int[]>, IJsonFormatter<UnsignedNumberArraySetting>
+    public class UnsignedArraySettingsFormatter : TypedFormatter<uint[]>, IJsonFormatter<UnsignedNumberArraySetting>
     {
         public override IConfigurationSetting Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
         {
@@ -206,12 +237,12 @@ namespace EthCanConfig.Conversion
                 return;
             writer.WritePropertyName(value.Name);
             writer.WriteBeginArray();
-            uint[] typedValue = value.TypedValue;
+            var typedValue = value.TypedValue;
             if (typedValue != null)
-                for (int i = 0; i < typedValue.Length; i++)
+                for (int i = 0; i < typedValue.Count; i++)
                 {
                     writer.WriteUInt32(typedValue[i]);
-                    if (i != typedValue.Length - 1)
+                    if (i != typedValue.Count - 1)
                         writer.WriteValueSeparator();
                 }
             writer.WriteEndArray();
@@ -394,6 +425,10 @@ namespace EthCanConfig.Conversion
                 else if (inner is EnumSetting en)
                 {
                     genericFormatter.Serialize(ref writer, en, formatterResolver);
+                }
+                else if (inner is EnumArraySetting eas)
+                {
+                    genericFormatter.Serialize(ref writer, eas, formatterResolver);
                 }
                 else
                     genericFormatter.Serialize(ref writer, inner, formatterResolver);

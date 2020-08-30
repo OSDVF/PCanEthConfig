@@ -1,13 +1,15 @@
 ﻿using EthCanConfig.Conversion;
 using ReactiveUI;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 using Utf8Json;
 
 namespace EthCanConfig.Models
 {
-    public class TypedSetting<T> : IConfigurationSetting
+    public class TypedSetting<T> : IConfigurationSetting, ITypedSetting
     {
         public virtual string Name { get; set; }
         public virtual object Value
@@ -30,6 +32,8 @@ namespace EthCanConfig.Models
                 OnChanged();
             }
         }
+
+        public Type GetSettingType() => typeof(T);
         [IgnoreDataMember]
         public virtual string StringValue
         {
@@ -42,10 +46,6 @@ namespace EthCanConfig.Models
                 if (typeof(T) == typeof(string))
                 {
                     TypedValue = (T)Convert.ChangeType(value,typeof(T));
-                }
-                else if (typeof(T).IsEnum)
-                {
-                    TypedValue = StringToEnum<T>(value, default);
                 }
                 else if (typeof(T) == typeof(int))
                 {
@@ -94,7 +94,20 @@ namespace EthCanConfig.Models
             Name = name;
             TypedValue = value;
         }
-        public IConfigurationSetting Clone() => MemberwiseClone() as IConfigurationSetting;
+        public IConfigurationSetting Clone()
+        {
+            var clone = MemberwiseClone() as TypedSetting<T>;
+            if(TypedValue is IList coll)//T implements ICollection
+            {
+                IList newColl = (T)Activator.CreateInstance(typeof (T)) as IList;
+                foreach(var item in coll)
+                {
+                    newColl.Add(item);
+                }
+                clone.TypedValue = (T)newColl;
+            }
+            return clone;
+        }
 
         public TEnum StringToEnum<TEnum>(string value, TEnum defaultValue)
         {
@@ -102,5 +115,10 @@ namespace EthCanConfig.Models
 
             return (TEnum)Enum.Parse(typeof(TEnum), value, true);
         }
+    }
+
+    public interface ITypedSetting
+    {
+        public Type GetSettingType();
     }
 }

@@ -142,6 +142,7 @@ namespace EthCanConfig.Conversion
                 {
                     new HardCodedSetting("type","printf"),
                     new StringSetting("inputName", string.Empty) { IsRequired = false},
+                    new UnsignedNumberArraySetting("inputIndexes"),
                     new StringSetting("format", string.Empty),
                     new UnsignedNumberSetting("waitFor", 0) { IsRequired = false, IsEnabled = false},
                 }),
@@ -149,11 +150,11 @@ namespace EthCanConfig.Conversion
                 {
                     new HardCodedSetting("type","cansend"),
                     new StringSetting("inputName", string.Empty) { IsRequired = false},
-                    new UnsignedNumberSetting("inputIndex",0),
+                    new UnsignedNumberArraySetting("inputIndexes"),
                     new StringSetting("channel","can0"),
                     new HexadecimalSetting("pgn",0x1FFFFFFF,8),
-                    new UnsignedNumberSetting("firstBitIndex",0),
-                    new EnumSetting("dataType",DataTypes.uint8),
+                    new UnsignedNumberArraySetting("firstBitIndexes"),
+                    new EnumArraySetting("dataTypes",DataTypes.uint8),
                     new UnsignedNumberSetting("waitFor", 0) { IsRequired = false, IsEnabled = false},
                 })
             })
