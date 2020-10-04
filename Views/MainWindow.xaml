@@ -9,7 +9,7 @@
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
         x:Class="EthCanConfig.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="EthCanConfig"
+        Title="EthCanConfig Exclusive Version"
         KeyDown="KeyDown">
 
   <Design.DataContext>
@@ -37,8 +37,7 @@
         <Line StartPoint="0,0" EndPoint="0,30" Stroke="Black" StrokeThickness="0.5" Margin="5,0,10,0"/>
         <TextBlock Text="Device: " FontWeight="Bold"/>
         <TextBox Text="{Binding DeviceInfo.IPToConnect, Mode=TwoWay}" Watermark="IP Address" />
-        <TextBox Text="{Binding DeviceInfo.Username, Mode=TwoWay}" Watermark="Username" />
-        <TextBox Text="{Binding DeviceInfo.Password, Mode=TwoWay}" Watermark="Password" PasswordChar="•" />
+        <TextBlock Text="Username and password are predefined" Foreground="Gray"/>
         <Button Content="Connect" Command="{Binding DeviceInfo.Connect}" CommandParameter="{Binding, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
         <Button Content="Device Info" Command="{Binding DeviceInfo.ShowInfo}"/>
         <Line StartPoint="0,0" EndPoint="0,30" Stroke="Black" StrokeThickness="0.5" Margin="5,0,10,0"/>
@@ -48,6 +47,7 @@
         <Button Content="Upload Configuration File" Command="{Binding DeviceInfo.UploadSettings}" CommandParameter="{Binding, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" ToolTip.Tip="Reboot will be required">
         </Button>
         <Button Content="Update Software" Command="{Binding DeviceInfo.UploadSoftware}" CommandParameter="{Binding, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" ToolTip.Tip="Reboot will be required"/>
+        <Button Content="Reboot" Command="{Binding DeviceInfo.Reboot}" />
         <ProgressBar IsVisible="False" x:Name="uploadingProgressBar" Maximum="100" />
         <TextBlock x:Name="uploadState" IsVisible="False" Text="Successfully uploaded"/>
       </StackPanel>

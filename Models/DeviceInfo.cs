@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Data.Converters;
+using Avalonia.Threading;
 using EthCanConfig.ViewModels;
 using MessageBox.Avalonia.DTO;
 using ReactiveUI;
@@ -7,19 +8,21 @@ using Renci.SshNet;
 using Renci.SshNet.Common;
 using System;
 using System.IO;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace EthCanConfig.Models
 {
     public class DeviceInfo : ReactiveObject
     {
-        private readonly string binaryPath = "/mnt/user/eth-can-router";
-        private readonly string scriptPath = "/etc/init.d/S100eth-can-router";
+        private const string binaryPath = "/mnt/user/eth-can-router";
+        private const string scriptPath = "/etc/init.d/S100eth-can-router";
         public bool Connected { get => connected; set => connected = value; }
         public string IPToConnect { get => iPToConnect; set => iPToConnect = value; }
-        public string Password { get; set; }
-        public string Username { get; set; }
+        public string Password = "root";
+        public string Username = "root";
 
         public EventHandler<ScpUploadEventArgs> Uploading;
         SshClient ssh;
@@ -57,9 +60,13 @@ namespace EthCanConfig.Models
             });
             m.Show();
         }
-
         public void Connect(Window parentWindow)
         {
+            Connect(parentWindow,1,5000);
+        }
+        public void Connect(Window parentWindow,int numberOfRetries = 0,int retryInterval = 5000)
+        {
+            retry:
             try
             {
                 ssh = new SshClient(IPToConnect, Username, Password);
@@ -73,12 +80,21 @@ namespace EthCanConfig.Models
             catch (Exception e)
             {
                 Connected = false;
-                var m = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams()
+                if(numberOfRetries>0)
                 {
-                    ContentTitle = "Error Connecting",
-                    ContentMessage = e.Message
+                    numberOfRetries--;
+                    Thread.Sleep(retryInterval);
+                    goto retry;
+                }
+                Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    var m = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams()
+                    {
+                        ContentTitle = "Error Connecting",
+                        ContentMessage = e.Message
+                    });
+                    m.ShowDialog(parentWindow);
                 });
-                m.ShowDialog(parentWindow);
             }
         }
 
@@ -93,16 +109,12 @@ namespace EthCanConfig.Models
             {
                 PrepareRemoteDirectories();
                 var str = new MemoryStream(Properties.Resources.eth_can_router);
-                var str2 = new MemoryStream(Properties.Resources.startup);
                 Task.Run(() =>
                 {
                     scp.Upload(str, binaryPath);
-                    scp.Upload(str2, scriptPath);
-                    ssh.RunCommand($"chmod +x {binaryPath} {scriptPath}");
+                    ssh.RunCommand($"chmod +x {binaryPath}");
+                    var result = ssh.RunCommand($"{binaryPath} -s");//Install startup script
                     str.Close();
-                    str2.Close();
-                    ssh.RunCommand("reboot");
-                    Reconnect(parentWindow);
                 }
                 );
             }
@@ -134,7 +146,6 @@ namespace EthCanConfig.Models
             }
             try
             {
-                PrepareRemoteDirectories();
                 //Now pretty ugly setting parsing into platform config
                 var context = ((MainWindowViewModel)parentWindow.DataContext);
                 var net = context.SettingsObject.InnerSettings["net"] as ContainerSetting;
@@ -164,7 +175,7 @@ namespace EthCanConfig.Models
                 }
                 var str = new MemoryStream(Encoding.UTF8.GetBytes(context.JSONPreview));
                 var str2 = new MemoryStream(Encoding.UTF8.GetBytes(//PEAK Configuration files
-                    @$"WLAN_DRIVER_REGCODE=
+                    @$"WLAN_DRIVER_REGCODE=0x00
 BT_DRIVER=
 IP_ADDRESS={ip}
 IP_NETMASK={mask}
@@ -180,10 +191,8 @@ WLAN_SECURITY=/mnt/user/wpa_supplicant.conf
                 {
                     scp.Upload(str, "/mnt/user/default.json");
                     scp.Upload(str2, "/mnt/user/platform.config");
-                    ssh.RunCommand("reboot");
                     str.Close();
                     str2.Close();
-                    Reconnect(parentWindow);
                 });
 
                 IPToConnect = ip;
@@ -201,12 +210,31 @@ WLAN_SECURITY=/mnt/user/wpa_supplicant.conf
             }
         }
 
-        private void Reconnect(Window parentWindow)
+        public void Reboot()
+        {
+            try
+            {
+                ssh.RunCommand("reboot");
+                ssh.Disconnect();
+                scp.Disconnect();
+            }
+            catch(Exception e)
+            {
+                var m = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(new MessageBoxStandardParams()
+                {
+                    ContentTitle = "Error when rebooting",
+                    ContentMessage = e.Message
+                });
+                m.Show();
+            }
+        }
+
+        private void Reconnect(Window parentWindow, int numberOfRetries = 0)
         {
             ssh.Disconnect();
             scp.Disconnect();
             Connected = false;
-            Connect(parentWindow);//Reconnect after reboot
+            Connect(parentWindow, numberOfRetries);//Reconnect after reboot
         }
     }
     public class BoolToConnectedConverter : FuncValueConverter<bool, string>

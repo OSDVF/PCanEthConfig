@@ -5,6 +5,8 @@
     <!-- dependencies coming from the package manager lock file should not be copied locally for .NET Core and .NETStandard projects -->
     <CopyLocalLockFileAssemblies Condition="'$(CopyLocalLockFileAssemblies)' == ''">false</CopyLocalLockFileAssemblies>
     <Authors>O.S.DV.F</Authors>
+    <Version>1.1.7</Version>
+    <PackageProjectUrl>https://github.com/OSDVF/PCanEthWiki</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
     <Compile Update="**\*.xaml.cs">

@@ -10,6 +10,7 @@ using EthCanConfig.Models;
 using EthCanConfig.ViewModels;
 using ReactiveUI;
 using Renci.SshNet.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http.Headers;
@@ -63,7 +64,7 @@ namespace EthCanConfig.Views
             if (percent == 100)
             {
                 Thread.Sleep(2000);
-                Dispatcher.UIThread.InvokeAsync(()=> uploadState.IsVisible = false);
+                Dispatcher.UIThread.InvokeAsync(() => uploadState.IsVisible = false);
             }
         }
 
@@ -89,12 +90,19 @@ namespace EthCanConfig.Views
                 Title = "Open Configuration File"
             };
             var result = await dialog.ShowAsync(this);
-            if (result != null)
+            if (result != null && result.Length != 0)
             {
                 using var stream = new FileStream(result[0], FileMode.Open);
-                viewModel.SettingsObject = JsonHelper.Deserialize(stream);
-                viewModel.SettingsDirty = false;
-                viewModel.SavedFileName = result[0];
+                try
+                {
+                    viewModel.SettingsObject = JsonHelper.Deserialize(stream);
+                    viewModel.SettingsDirty = false;
+                    viewModel.SavedFileName = result[0];
+                }
+                catch (Exception er)
+                {
+                    MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow("Error", "Could not load configuration file because of error " + er.Message, icon: MessageBox.Avalonia.Enums.Icon.Error).ShowDialog(this);
+                }
             }
         }
 
@@ -164,7 +172,7 @@ namespace EthCanConfig.Views
     }
     public class BooleanToDirtyTextConverter : FuncValueConverter<bool, string>
     {
-        public BooleanToDirtyTextConverter() : base((x => x ? "❌ Unsaved" : "✅ Saved"))
+        public BooleanToDirtyTextConverter() : base((x => x ? "❌ Config File Unsaved" : "✅ Saved"))
         {
         }
     }

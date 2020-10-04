@@ -105,6 +105,21 @@ namespace EthCanConfig.Conversion
                     new StringSetting("destinationName", string.Empty) { IsRequired = false},
                     new UnsignedNumberSetting("destinationIndex",0) { IsRequired = false},
                 }),
+                new SettingsTemplate("Parse numbers",new ChildObservableCollection<IConfigurationSetting>(){
+                    new HardCodedSetting("action","parsenum"),
+                    new StringSetting("inputName", string.Empty) { IsRequired = false},
+                    new UnsignedNumberArraySetting("inputIndexes"),
+                    new StringSetting("format", string.Empty),
+                    new StringSetting("destinationName", string.Empty) { IsRequired = false},
+                    new UnsignedNumberArraySetting("destinationIndexes"),
+
+                }),
+                new SettingsTemplate("Existence Check", new ChildObservableCollection<IConfigurationSetting>(){
+                    new HardCodedSetting("action","exists"),
+                    new StringSetting("inputName", string.Empty) { IsRequired = false},
+                    new UnsignedNumberSetting("inputIndex",0),
+                    new UnsignedNumberSetting("setFlags", 0) { IsRequired = false, IsEnabled = false},
+                }),
                 new SettingsTemplate("dictionary",new ChildObservableCollection<IConfigurationSetting>()
                 {
                     new HardCodedSetting("action","dictionary"),

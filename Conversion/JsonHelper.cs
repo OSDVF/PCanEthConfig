@@ -210,7 +210,7 @@ namespace EthCanConfig.Conversion
                     {
                         if (lst.Count != 0)
                         {
-                            if(innerSetting.Value == null&& innerSetting is ITypedSetting typedInnerSetting)
+                            if (innerSetting.Value == null && innerSetting is ITypedSetting typedInnerSetting)
                             {
                                 var newCollection = Activator.CreateInstance(typedInnerSetting.GetSettingType());
                                 innerSetting.Value = newCollection;
@@ -219,7 +219,7 @@ namespace EthCanConfig.Conversion
                             outputCol.Clear();//Because there can be some items cloned from template
                             for (int i = 0; i < lst.Count; i++)
                             {
-                                if(lst[i] is string lstStr)//String arrays
+                                if (lst[i] is string lstStr)//String arrays
                                 {
                                     var en = mapStringToEnum(lstStr);
                                     if (en == null)
@@ -233,7 +233,7 @@ namespace EthCanConfig.Conversion
                                 }
                                 else//For other arrays
                                 {
-                                    outputCol.Add(Convert.ChangeType(lst[i],outputCol.GetType().GetGenericArguments()[0]));
+                                    outputCol.Add(Convert.ChangeType(lst[i], outputCol.GetType().GetGenericArguments()[0]));
                                 }
                             }
                         }
@@ -320,9 +320,17 @@ namespace EthCanConfig.Conversion
             foreach (Dictionary<string, object> actionConverter in listener["converters"]["actions"])
             {
                 var outputActionConvs = outputConverters.InnerSettings["actions"] as MultipleAdditiveContainerSetting;
-                string[] actionTemplates = { "not", "mask", "lshift", "rshift", "concat", "shuffle", "swap", "printf", "dictionary", "sed", "regex", "nmeacc" };
-                outputActionConvs.AddSetting(actionTemplates.IndexOf(actionConverter["action"]));
-                AddInnerSettingsByTemplateIndex(converterIndex, actionConverter, ref outputActionConvs);
+                string[] actionTemplates = { "not", "mask", "lshift", "rshift", "concat", "shuffle", "swap", "printf", "parsenum","exists", "dictionary", "sed", "regex", "nmeacc" };
+                var convName = actionConverter["action"];
+                try
+                {
+                    outputActionConvs.AddSetting(actionTemplates.IndexOf(convName));
+                    AddInnerSettingsByTemplateIndex(converterIndex, actionConverter, ref outputActionConvs);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    throw new IndexOutOfRangeException("There is an unknown action converter \"" + convName + "\" in opened file.");
+                }
                 converterIndex++;
             }
 

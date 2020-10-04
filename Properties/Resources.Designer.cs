@@ -69,15 +69,5 @@ namespace EthCanConfig.Properties {
                 return ((byte[])(obj));
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        public static byte[] startup {
-            get {
-                object obj = ResourceManager.GetObject("startup", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }
